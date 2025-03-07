@@ -1,0 +1,19 @@
+Name: %in%
+Description: Inserts %in% at cursor position
+Binding: insert_subset_pipe
+Interactive: false
+
+Name: Separate functions arguments onto separate lines
+Description: Separate functions arguments onto separate lines
+Binding: addin_reshape
+Interactive: false
+
+Name: Insert section title
+Description: Inserts section title at cursor position
+Binding: insert_section_title
+Interactive: false
+
+Name: Style code (custom)
+Description: Styles code that has been copied to clipboard
+Binding: style_code
+Interactive: false

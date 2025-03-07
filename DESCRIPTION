@@ -12,6 +12,7 @@ Imports:
     bigrquery,
     grid,
     gtable,
+    job,
     scales,
     survival,
     tidyverse
