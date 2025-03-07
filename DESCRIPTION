@@ -1,0 +1,32 @@
+Package: aou
+Title: Functions for use in All of Us workbench
+Version: 0.0.0.9000
+Author: Michael Abers
+Maintainer: Michael Abers <abersm@gmail.com>
+Description: Facilitates the data management, analysis, and visualization of data in All of Us.
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Imports:
+    allofus,
+    bigrquery,
+    grid,
+    gtable,
+    scales,
+    survival,
+    tidyverse
+Suggests: 
+    brolgar,
+    cli,
+    corrplot,
+    ggbeeswarm,
+    ggforce,
+    openxlsx,
+    pheatmap,
+    scattermore,
+    tsibble
+License: MIT + file LICENSE
+Depends: 
+    R (>= 4.2.1)
+Config/testthat/edition: 3
+StagedInstall: no
