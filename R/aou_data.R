@@ -28,7 +28,7 @@ load_df <- function(
   sql <- paste0("sql_", names)
   types <- unname(lookup[names])
   fn({
-    out <- lapply(seq_along(names), function(i) write_raw_data(eval(sql[i]), filename = names[i], type = types[i]))
+    out <- lapply(seq_along(names), function(i) aou::write_raw_data(eval(sql[i]), filename = names[i], type = types[i]))
     names(out) <- names
     out
   })
