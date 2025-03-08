@@ -1,7 +1,7 @@
 #' Load data from workbench using SQL
 #'
 #' @param patients,pneumonia,cv_complications If `TRUE` (default), data frame is loaded
-#' @param other Other data frames to load. Enter as character vector. Options: `"demographics"`, `"comorbidities"`, `"substance_use"`. Default includes all
+#' @param other Other data frames to load. Enter as character vector. Options: `"demographics"`, `"comorbidities"`, `"substance_use"`, `"inflammatory_markers"`, `"lipids_a1c"`, `"bcx"`, `"sputum_uag"`. Default includes 1st 3
 #' @returns List of data frames
 #' @export
 load_df <- function(
@@ -15,16 +15,31 @@ load_df <- function(
     if (cv_complications) "cv_complications",
     other
   )
-  lookup <- c(
+  types <- c(
     patients = "person",
     pneumonia = "conditions",
     cv_complications = "conditions",
-    comorbidities = "surveys",
-    substance_use = "surveys"
+    demographics = "surveys",
+    comorbidities = "conditions",
+    substance_use = "surveys",
+    inflammatory_markers = "measurements",
+    lipids_a1c = "measurements",
+    bcx = "measurements",
+    sputum_uag = "measurements"
   )
-  sql <- paste0("sql_", names)
-  types <- unname(lookup[names])
-  out <- lapply(seq_along(names), function(i) aou::write_raw_data(eval(sql[i]), filename = names[i], type = types[i]))
+  sql <- c(
+    patients = sql_patients,
+    pneumonia = sql_pneumonia,
+    cv_complications = sql_cv_complications,
+    demographics = sql_demographics,
+    comorbidities = sql_comorbidities,
+    substance_use = sql_substance_use,
+    inflammatory_markers = sql_inflammatory_markers,
+    lipids_a1c = sql_lipids_a1c,
+    bcx = sql_bcx,
+    sputum_uag = sql_sputum_uag
+  )
+  out <- lapply(names, function(x) tryElse(aou::write_raw_data(sql[x], filename = x, type = types[x]), otherwise = "Error"))
   names(out) <- names
   out
 }

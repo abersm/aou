@@ -12,7 +12,7 @@ guess_sql_query_type <- function(x) {
 # Patients ----------------------------------------------------------------
 
 # type: person
-sql_patient <- "
+sql_patients <- "
     SELECT
         person.person_id,
         person.gender_concept_id,
@@ -168,7 +168,7 @@ sql_patient <- "
 # Demographics ------------------------------------------------------------
 
 # type: survey
-sql_demog <- "
+sql_demographics <- "
     SELECT
         answer.person_id,
         answer.survey_datetime,
@@ -470,7 +470,7 @@ sql_substance_use <- "
 # Comorbidities -----------------------------------------------------------
 
 # type: condition
-sql_comorb <- "
+sql_comorbidities <- "
     SELECT
         c_occurrence.person_id,
         c_occurrence.condition_concept_id,

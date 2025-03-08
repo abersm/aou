@@ -238,3 +238,11 @@ match_fun <- function(fn) {
   env <- parent.frame(2)
   get(as.character(fn), mode = "function", envir = env)
 }
+
+tryElse <- function(x, otherwise = NULL, silent = TRUE) {
+  if (silent) {
+    tryCatch(suppressWarnings(x), error = function(e) otherwise)
+  } else {
+    tryCatch(x, error = function(e) otherwise)
+  }
+}
