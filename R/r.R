@@ -240,7 +240,7 @@ r.data.frame <- function(x, ...) {
 #'
 #' @rdname r
 #' @export
-r.grouped_df <- function(x, ...) dplyr::summarize(x, n = n(), .groups = "drop_last")
+r.grouped_df <- function(x, ...) dplyr::summarize(x, n = dplyr::n(), .groups = "drop_last")
 
 #' r - lm
 #'

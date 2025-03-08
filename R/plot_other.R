@@ -54,36 +54,6 @@ plot_piechart <- function(
   p
 }
 
-# Map ---------------------------------------------------------------------
-
-#' Plot of world map
-#'
-#' @param countries Countries to highlight on map. Enter as character vector
-#' @param color_for_countries Color used to fill countries mentioned in countries argument
-#' @param color_other_countries Color used to fill countries not mentioned in countries argument. Default is `"grey"`
-#' @param line_color Line color for country borders. Default is `"black"`
-#' @param line_thickness Line thickness for country borders. Default is `0.3`
-#' @param ... Arguments passed to `theme_blank`
-#' @returns ggplot object
-#' @export
-plot_map <- function(
-    countries = NULL,
-    color_for_countries = "#C8543B",
-    color_other_countries = "#F7F7F7",
-    line_color = "#333333",
-    line_thickness = 0.3,
-    ...) {
-  pkg_required("ggfocus")
-  if (is.null(countries)) {
-    color_for_countries <- color_other_countries
-    countries <- "USA"
-  }
-  ggplot2::ggplot(ggplot2::map_data("world"), ggplot2::aes(x = long, y = lat, group = group, fill = region)) +
-    ggplot2::geom_polygon(color = line_color, linewidth = line_thickness) +
-    ggfocus::scale_fill_focus(focus_levels = countries, color_focus = color_for_countries, color_other = color_other_countries) +
-    theme_blank(...)
-}
-
 # Legend ------------------------------------------------------------------
 
 #' Create a plot legend
@@ -211,33 +181,6 @@ plot_interactive <- function(x = last_plot(), tooltip_vars = NULL, show_legend =
 #' @noRd
 plotly <- plot_interactive
 
-#' Display all shapes for ggplot2
-#'
-#' @returns ggplot object
-#' @noRd
-show_point_options <- function() {
-  ggplot2::ggplot(vec_to_df(p = seq(0, 25, by = 1L))) +
-    ggplot2::scale_x_continuous(name = "") +
-    ggplot2::scale_shape_identity() +
-    ggplot2::geom_point(mapping = ggplot2::aes(x = p %% 6, y = p %/% 6, shape = p), size = 5, fill = "#BC3C29") +
-    ggplot2::geom_text(mapping = ggplot2::aes(x = p %% 6, y = p %/% 6 + 0.25, label = p), size = 3)+
-    ggplot2::scale_y_reverse(name = "") +
-    ggplot2::theme(rect = ggplot2::element_blank(), axis.title =  ggplot2::element_blank(), axis.line = ggplot2::element_blank(), axis.text = ggplot2::element_blank(), axis.ticks = ggplot2::element_blank())
-}
-
-#' Display all linetypes for ggplot2
-#'
-#' @returns ggplot object
-#' @noRd
-show_linetype_options <- function() {
-  ggplot2::ggplot(vec_to_df(x = c("blank", "solid", "dashed", "dotted", "dotdash", "longdash", "twodash", "1F", "F1", "4C88C488", "12345678"))) +
-    ggplot2::scale_x_continuous(name = "", limits = c(0, 1), breaks = NULL) +
-    ggplot2::scale_y_discrete(name = "") +
-    ggplot2::scale_linetype_identity() +
-    ggplot2::geom_segment(mapping = ggplot2::aes(x = 0, xend = 1, y = x, yend = x, linetype = x)) +
-    ggplot2::theme(text = ggplot2::element_text(size = 14), line = ggplot2::element_blank(), axis.text.y = ggplot2::element_text(margin = ggplot2::margin(r = -10, unit = "pt")), panel.background = ggplot2::element_rect(fill = "white"))
-}
-
 #' Display ggproto function(s)
 #'
 #' @param x ggproto object (GeomX) or ggproto method (GeomX$setup_data)
@@ -307,70 +250,3 @@ ggproto_fn <- function(x, fn = NULL, copy = TRUE) {
   out
 }
 
-# Example plot ------------------------------------------------------------
-
-#' Example plot - y vs. x
-#'
-#' @param fn Plot function. Default is `plot_bar_point`
-#' @param formula formula. Default is `re ~ day`
-#' @param group Grouping variable. Default is `"genotype"`
-#' @param ... Arguments passed to `fn`
-#' @returns ggplot object
-#' @export
-plot_ex <- function(fn = "plot_bar_point", ...) {
-  fn <- get_input(fn)
-  if (!startsWith(fn, "plot_") && fn %!in% pkg_fns("abers")) {
-    fn <- paste0("plot_", fn)
-  }
-  args <- switch(
-    fn,
-    plot_bar = ,
-    plot_box = ,
-    plot_line = ,
-    plot_line_mean = ,
-    plot_point = ,
-    plot_bar_point = list(df = dplyr::filter(dock8, gene == "Il17f"), formula = re ~ day, grouping_var = "genotype", y_axis_title = "Relative expression", ...),
-    plot_freq = list(df = covid, col = "severity_death", grouping_var = "gender", x_axis_label_angle = 45, ...),
-    plot_violin = list(df = covid, formula = wbc ~ gender, y_axis_title = "WBC", x_axis_label_angle = 45, ...),
-    plot_cor = list(df = covid, formula = wbc ~ age, y_axis_title = "WBC", x_axis_title = "Age"),
-    plot_cor_heatmap = list(covid, ...),
-    plot_heatmap = ,
-    plot_histogram = ,
-    plot_density = list(df = covid, col = "age", grouping_var = "gender", ...),
-    plot_gating_tree = list(gs_gate_paths(gs_example()), ...),
-    plot_gsea = ,
-    plot_smooth = list(df = dock8[dock8$gene == "Il17a", , drop = FALSE], formula = re ~ day, grouping_var = "genotype", ...),
-    plot_paired = {
-      df <- dock8[dock8$gene %in% c("Il17a", "Il17f") & dock8$day < 5, , drop = FALSE]
-      df <- df[order(df$genotype), , drop = FALSE]
-      df <- dplyr::group_by(df, gene, day)
-      df <- dplyr::mutate(df, id = seq_len(dplyr::n()))
-      df <- dplyr::ungroup(df)
-      list(df = df, formula = re ~ day, facet_var = "gene", ...)
-    },
-    plot_spag_facet_strata = list(df = covid, y = "wbc", strata_var = "age", time = "time", ...),
-    plot_spaghetti = list(df = dock8[dock8$gene == "Il17a", , drop = FALSE], formula = re ~ day, id = "id", ...),
-    plot_scatter = list(df = covid, formula = wbc ~ hgb, ...),
-    plot_roc = list(df = covid, outcome_var = "death", predictor_var = "age", ...),
-    plot_km = list(df = set_max_follow_up_time(covid, max_time = 40), predictor_var = "gender", ...),
-    plot_forest = ,
-    plot_incidence = list(df = covid, date = "date_admission", ...),
-    plot_piechart = list(df = counts(xtab(covid, severity_death, gender)), ...),
-    plot_volcano = list(df = Rename(compare_means(dock8[dock8$day == 1, , drop = FALSE], re ~ genotype, "gene"), fc_median = "fc"), ...),
-    plot_swimmer = list(covid, time_var = "days_admission", ...),
-    plot_map = list("USA", ...),
-    plot_96_well_plate = list(...),
-    plot_interactive = list(x = plot_point(df = dock8[dock8$gene == "Il17a", , drop = FALSE], formula = re ~ day, grouping_var = "genotype", ...)),
-    plot_tsne = list(df = downsample(facs_df(ff_example()), 1000), ...),
-    plot_signal_time = list(df = downsample(facs_df(ff_example()), 1000), ...),
-    plot_n_x_n = list(df = downsample(facs_df(ff_example()), 1000), ...),
-    plot_backgate = list(gs = gs_example(), gate_path = "/Cells/Singlets/Singlets/Live/CD45/Non-PMN/Mac", ...),
-    plot_comp_n_x_n = list(x = gs_example(), ...),
-    plot_histogram_facs = list(df = downsample(facs_df(ff_example()), 5000), x = "PE-Cy5-A", offset = FALSE, ...),
-    plot_contour = list(df = downsample(facs_df(ff_example()), 50000), x = "PE-Cy5-A", y = "BUV395-A", ...),
-    plot_dot = ,
-    plot_pseudocolor = list(df = downsample(facs_df(ff_example()), 5000), x = "PE-Cy5-A", y = "BUV395-A", ...),
-    list(df = covid, formula = age ~ gender, ...)
-  )
-  do.call(fn, args)
-}

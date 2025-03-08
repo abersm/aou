@@ -84,7 +84,10 @@ str_remove <- function(x, pattern, all = TRUE, ...) {
 #'
 #' @rdname str_remove
 #' @export
-str_remove_numerics <- function(x, all = TRUE) str_replace_numerics(x, replacement = "", all = all)
+str_remove_numerics <- function(x, all = TRUE) {
+  fn <- if (all) gsub else sub
+  fn("[0-9.]", "", x)
+}
 
 #' Remove letters from string
 #'
@@ -95,12 +98,6 @@ str_remove_letters <- function(x, case = "both", all = TRUE) {
   pattern <- switch(case, lower = "[a-z]", upper = "[A-Z]", all = , "[[:alpha:]]")
   str_remove(x, pattern = pattern, all = all)
 }
-
-#' Alias for `str_alphanum`
-#'
-#' @rdname str_remove
-#' @export
-str_remove_punc <- str_alphanum
 
 #' Wrapper for trimws
 #'

@@ -419,7 +419,7 @@ p_sig_dunn <- function(
       xmin = xmin,
       xmax = xmax,
       #y = max(group_max[x], na.rm = TRUE),
-      p = tryCatch(2*pnorm(z, lower.tail = FALSE), error = function(e) NA_real_)
+      p = tryCatch(2*stats::pnorm(z, lower.tail = FALSE), error = function(e) NA_real_)
     )
   })
   do.call(rbind.data.frame, out)

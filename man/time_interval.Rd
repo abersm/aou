@@ -24,8 +24,3 @@ Numeric vector with units of time determined by \code{units}
 \description{
 Time interval between 2 dates
 }
-\examples{
-# time_interval(covid$date_admission, covid$date_death)
-# mutate(covid, days = time_interval(date_admission, date_death))
-
-}

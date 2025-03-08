@@ -146,7 +146,7 @@ surv_tidy <- function(x, ci = 0.95, clean_predictor_names = TRUE) {
     hr = exp(beta),
     hr_lower = exp(beta - z),
     hr_upper = exp(beta + z),
-    p_wald = pchisq(X*X, 1, lower.tail = FALSE),
+    p_wald = stats::pchisq(X*X, 1, lower.tail = FALSE),
     n = x$n,
     n_events = x$nevent,
     univariate = x$univariate)
@@ -176,15 +176,15 @@ surv_glance <- function(x) {
     time_var = vars$time_var,
     n = n,
     n_events = x$nevent,
-    p_log_rank_coxph_model = pchisq(x$score, deg_free, lower.tail = FALSE),
-    p_wald_model = pchisq(as.vector(x$wald.test), deg_free, lower.tail = FALSE),
-    p_log_likelihood_model = pchisq(logtest, deg_free, lower.tail = FALSE),
+    p_log_rank_coxph_model = stats::pchisq(x$score, deg_free, lower.tail = FALSE),
+    p_wald_model = stats::pchisq(as.vector(x$wald.test), deg_free, lower.tail = FALSE),
+    p_log_likelihood_model = stats::pchisq(logtest, deg_free, lower.tail = FALSE),
     concordance = concordance[1L],
     concordance_se = concordance[2L],
     r_sq = 1 - exp(-logtest/n),
     r_sq_max = 1 - exp(2*loglik_1/n),
-    aic = AIC(x),
-    bic = BIC(x),
+    aic = stats::AIC(x),
+    bic = stats::BIC(x),
     univariate = vars$univariate)
   out$covariates <- list(vars$predictor_var)
   move_cols(out, "outcome_var", "time_var", "covariates")

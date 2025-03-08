@@ -152,35 +152,6 @@ ggplot_add.new_color <- function(object, plot, object_name) {
   .df[stats::complete.cases(.df[.vars_remove_na]), , drop = FALSE]
 }
 
-#' Create data frame for plotting FACS data
-#'
-#' @param .df,.x,.y,.grouping_var,.downsample_var,.grouping_var,.n_max, Inputs to parent plotting function of the same name without leading "."
-#' @param .parent_fn Parent (plotting) function. Enter as length 1 character vector
-#' @returns Data frame with original columns and new variable "grouping_var"
-#' @noRd
-.create_plot_df_facs <- function(
-    .df,
-    .x,
-    .y,
-    .grouping_var,
-    .downsample_var,
-    .n_max,
-    .parent_fn) {
-  # Check that .x and .y are included in data
-  .df_names <- names(.df)
-  if (any(idx <- c(.x, .y) %!in% .df_names)) {
-    Stop(sprintf("In '%s', the following channels are not present in 'df':\n", .parent_fn), .quote_collapse(c(.x, .y)[idx], sep = "\n"))
-  }
-
-  # Downsample
-  if (is.finite(.n_max) && length(.downsample_var) == 1L && any(.df_names == .downsample_var)) {
-    .df <- downsample(.df, by = .downsample_var, n = .n_max, all_groups_equal = FALSE)
-  }
-
-  # Grouping variable
-  .add_cat_aes_vars(.df, vars_input = list(.grouping_var), vars_new = "grouping_var", df_names = .df_names)
-}
-
 #' Use a data frame and variable names to split a continuous variable by a grouping variable into lists of numeric vectors
 #'
 #' @param df Data frame
@@ -285,98 +256,6 @@ ggplot_add.new_color <- function(object, plot, object_name) {
 
 # Other -------------------------------------------------------------------
 
-#' Determine coordinates of rectangle containing lowest density of data points in plotting region
-#'
-#' @param x,y Raw data values for x and y variables. Enter as numeric vectors
-#' @param n,n_x,n_y Number of bins along x or y axis to calculate point density. Use `n` to set `n_x` and `n_y` to the same value (square grid). `n_x` is ignored if `width` is specified. `n_y` is ignored if `height` is specified
-#' @param width,height Width and height of lowest density rectangular region. Enter as fraction (length 1 numeric with values between 0-1) of total plotting space along for x (`width` as a fraction of `x_limits[2L] - x_limits[1L]`) or y axis (`height` as a fraction of `y_limits[2L] - y_limits[1L]`). If specified, `n` (and corresponding `n_x` or `n_y`) will be ignored. Overrides `n`, `n_x`, `n_y` counterparts
-#' @param x_limits,y_limits Axis limits for x and y axis, respectively. Defines the plotting space. Enter as length 2 numeric vector. Order must be minimum then maximum. Default applies `Range` to `x` or `y`
-#' @returns List of numeric vectors "x" and "y" containing coordinate of top left corner of lowest density rectangle
-#' @noRd
-rect_min_density <- function(
-    x,
-    y,
-    n = 3,
-    n_x = n,
-    n_y = n,
-    width = 1/n_x,
-    height = 1/n_y,
-    x_limits = Range(x),
-    y_limits = Range(y)) {
-  idx <- !is.na(x + y)
-  x <- x[idx]
-  y <- y[idx]
-  if (width != 1/n_x) {
-    n_x <- ceiling(1/width)
-  }
-  if (height != 1/n_y) {
-    n_y <- ceiling(1/height)
-  }
-  x_breaks <- .breaks(x_limits, n_x)
-  y_breaks <- .breaks(y_limits, n_y)
-  x_idx <- findInterval(x, vec = x_breaks, all.inside = TRUE, left.open = FALSE, rightmost.closed = FALSE)
-  y_idx <- findInterval(y, vec = y_breaks, all.inside = TRUE, left.open = FALSE, rightmost.closed = FALSE)
-  counts <- x_idx + n_x*y_idx - n_x
-  counts <- tabulate(counts, n_x*n_y)
-  counts <- matrix(counts, nrow = n_x, ncol = n_y)
-  n_x1 <- n_x + 1L
-  x_breaks[c(1L, n_x1)] <- x_limits
-  y_breaks[c(1L, n_y + 1L)] <- y_limits
-  x_rect <- x_breaks[-n_x1]
-  y_rect <- y_breaks[-1L]
-  width <- x_rect[2L] - x_rect[1L]
-  height <- y_rect[2L] - y_rect[1L]
-  optimal <- counts == min(counts)
-  coord_optimal <- which(optimal, arr.ind = TRUE)
-  x_optimal <- x_rect[coord_optimal[, 1L]]
-  y_optimal <- y_rect[coord_optimal[, 2L]]
-  list(
-    x = x_optimal,
-    y = y_optimal
-  )
-}
-
-#' Determine optimal coordinates for annotation/label placement
-#'
-#' @param x ggplot object
-#' @param geom Name of plotted geom to avoid when placing label. Enter as lower case character vector
-#' @param x_nudge_left,x_nudge_right Placement of label along x axis as percent of axis
-#' @param y_nudge_top,y_nudge_bottom Placement of label along y axis as percent of axis
-#' @param plot_limits List composed of "x" and "y" (each length 2 numeric vector containing min and max value for plot)
-#' @returns Length 2 numeric vector containing x and y coordinates for label
-#' @noRd
-.label_coords_optimal <- function(
-    x,
-    geom,
-    x_nudge_left = 0.1,
-    x_nudge_right = 0.8,
-    y_nudge_top = 0.9,
-    y_nudge_bottom = 0.2,
-    plot_limits = get_plot_limits(x)) {
-  y_limits <- plot_limits$y
-  x_limits <- plot_limits$x
-  x_min <- x_limits[1L]
-  x_max <- x_limits[2L]
-  y_min <- y_limits[1L]
-  y_max <- y_limits[2L]
-  delta_x_limits <- x_max - x_min
-  delta_y_limits <- y_max - y_min
-  df_geom <- get_plot_geom_data(x, geom)
-  if (!is.data.frame(df_geom)) {
-    #df_geom <- Reduce(rbind, df_geom)
-    df_geom <- dplyr::bind_rows(df_geom)
-  }
-  df_names <- names(df_geom)
-  geom_x_limits <- Range(unlist(df_geom[df_names %in% c("x", "xmin", "xmax", "xend", "xintercept", "xmin_final", "xmax_final", "xlower", "xmiddle", "xupper", "x0")], use.names = FALSE))
-  geom_y_limits <- Range(unlist(df_geom[df_names %in% c("y", "ymin", "ymax", "yend", "yintercept", "ymin_final", "ymax_final", "lower", "middle", "upper", "y0")], use.names = FALSE))
-  delta_x <- abs(x_limits - geom_x_limits)
-  delta_y <- abs(y_limits - geom_y_limits)
-  x_multiplier <- if (delta_x[1L] > delta_x[2L]) x_nudge_right else x_nudge_left
-  x <- x_min + x_multiplier*delta_x_limits
-  y_multiplier <- if (delta_y[1L] > delta_y[2L]) y_nudge_top else y_nudge_bottom
-  y <- y_min + y_multiplier*delta_y_limits
-  c(x, y)
-}
 
 #' Golden ratio (phi)
 #'

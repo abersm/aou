@@ -57,7 +57,7 @@ compare_means <- function(
 
   # Remove missing data
   df <- df[c(continuous_var, grouping_var, subgroups)]
-  df <- df[complete.cases(df), , drop = FALSE]
+  df <- df[stats::complete.cases(df), , drop = FALSE]
 
   # Remove unused levels of factors
   if (is.factor(df[[grouping_var]])) {

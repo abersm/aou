@@ -4,7 +4,6 @@
 \alias{str_remove}
 \alias{str_remove_numerics}
 \alias{str_remove_letters}
-\alias{str_remove_punc}
 \alias{str_trimws}
 \alias{str_remove_space}
 \alias{str_remove_multi_space}
@@ -17,8 +16,6 @@ str_remove(x, pattern, all = TRUE, ...)
 str_remove_numerics(x, all = TRUE)
 
 str_remove_letters(x, case = "both", all = TRUE)
-
-str_remove_punc(x)
 
 str_trimws(x, side = c("both", "left", "right"))
 
@@ -56,8 +53,6 @@ Remove a pattern from a string
 Remove numbers from a string
 
 Remove letters from string
-
-Alias for \code{str_alphanum}
 
 Wrapper for trimws
 

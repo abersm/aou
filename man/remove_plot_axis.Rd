@@ -2,12 +2,6 @@
 % Please edit documentation in R/plot_manipulation.R
 \name{remove_plot_axis}
 \alias{remove_plot_axis}
-\alias{remove_plot_axis_lines}
-\alias{remove_plot_axis_ticks}
-\alias{remove_plot_axis_text}
-\alias{remove_plot_axis_title}
-\alias{remove_plot_title}
-\alias{remove_plot_gridlines}
 \title{Remove axis}
 \usage{
 remove_plot_axis(
@@ -15,18 +9,6 @@ remove_plot_axis(
   axis = c("x", "y"),
   component = c("lines", "ticks", "text", "title")
 )
-
-remove_plot_axis_lines(x = NULL, axis = c("x", "y"))
-
-remove_plot_axis_ticks(x = NULL, axis = c("x", "y"))
-
-remove_plot_axis_text(x = NULL, axis = c("x", "y"))
-
-remove_plot_axis_title(x = NULL, axis = c("x", "y"))
-
-remove_plot_title(x = NULL)
-
-remove_plot_gridlines(x = NULL, axis = c("x", "y"), major = TRUE, minor = TRUE)
 }
 \arguments{
 \item{x}{ggplot object. If \code{NULL} (default), enter as \code{plot + remove_plot_axis()} to remove axis components}
@@ -34,24 +16,10 @@ remove_plot_gridlines(x = NULL, axis = c("x", "y"), major = TRUE, minor = TRUE)
 \item{axis}{Options: \code{"x"}, \code{"y"}, or both (default)}
 
 \item{component}{Components of axis to remove. Options: \code{"lines"}, \code{"ticks"}, \code{"text"}, \code{"title"}. Default includes all. Enter as character vector. Enter \code{NULL} to keep all elements}
-
-\item{major, minor}{If \code{TRUE} (default), component removed from plot}
 }
 \value{
 theme object with axis removed
 }
 \description{
 Remove axis
-
-Remove axis lines
-
-Remove axis tick marks
-
-Remove axis labels
-
-Remove axis title
-
-Remove plot title
-
-Remove plot grid lines
 }

@@ -74,6 +74,7 @@ add_comma <- function(x, big_mark = ",", include_decimal = FALSE) {
     post_decimal[idx_no_decimal] <- ""
   }
   post_decimal[!idx_no_decimal] <- paste0(".", post_decimal[!idx_no_decimal])
+  str_reverse <- function(x) vapply(lapply(strsplit(x, NULL), rev), paste, "", collapse = "")
   if (nzchar(big_mark) && length(idx_big_mark <- grep("[0-9]{4,}", pre_decimal))) {
     pre_decimal[idx_big_mark] <- str_reverse(gsub("([0-9]{3})\\B", paste0("\\1", big_mark), str_reverse(pre_decimal[idx_big_mark])))
   }

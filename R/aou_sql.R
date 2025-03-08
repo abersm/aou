@@ -1,3 +1,14 @@
+#' Guess sql query type from raw text
+#'
+#' @noRd
+guess_sql_query_type <- function(x) {
+  if (grepl("c_occurrence.", x, fixed = TRUE)) return("conditions")
+  if (grepl("survey.", x, fixed = TRUE)) return("surveys")
+  if (grepl("measurement.", x, fixed = TRUE)) return("measurements")
+  if (grepl("person.", x, fixed = TRUE)) return("person")
+  stop("Unknown sql type")
+}
+
 # Patients ----------------------------------------------------------------
 
 # type: person

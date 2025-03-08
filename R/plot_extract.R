@@ -118,27 +118,6 @@ get_plot_geom_data <- function(x, geom) {
   if (length(df) == 1L) df[[1L]] else df
 }
 
-# Legend ------------------------------------------------------------------
-
-#' Get plot legend
-#'
-#' @param x ggplot object
-#' @returns Plot legend as ggplot object
-#' @export
-get_plot_legend <- function(x) {
-  plot_grob <- ggplot2::ggplotGrob(x)
-  # Must use which() in line below
-  idx <- which(vapply(plot_grob$grobs, function(z) z$name == "guide-box", logical(1), USE.NAMES = FALSE))
-  if (length(idx) == 0L) return(NULL)
-  plot_grob <- plot_grob$grobs[[idx]]
-  ggplot2::ggplot() +
-    ggplot2::coord_cartesian(xlim = c(0, 1), ylim = c(0, 1), expand = FALSE, clip = "off") +
-    ggplot2::scale_x_continuous(name = NULL) +
-    ggplot2::scale_y_continuous(name = NULL) +
-    theme_clean() +
-    draw_grob(as_grob(plot_grob), x = 0, y = 0, width = 1, height = 1, scale = 1, hjust = 0, vjust = 0, halign = 0.5, valign = 0.5)
-}
-
 # aes ---------------------------------------------------------------------
 
 #' Extract `aes` arguments for each plot layer

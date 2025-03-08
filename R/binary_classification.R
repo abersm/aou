@@ -542,7 +542,7 @@ eval_cutpoint_binary <- function(df, outcome_var, predictor_var, cp, type = ">="
     out$p <- z$p
     out
   } else {
-    map_dfr(cutpoint, function(x) {
+    purrr::map_dfr(cutpoint, function(x) {
       out <- sens_spec.data.frame(x = df, outcome_var = outcome_var, predictor_var = predictor_var, type = type, cutpoint = x)
       df$y <- .cont_to_binary_01(.subset2(df, predictor), cutpoint = x, type = type)
       z <- tryCatch(glm_tidy(Glm(df, formula)), error = function(e) NULL)

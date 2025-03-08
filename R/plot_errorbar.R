@@ -178,7 +178,7 @@ median_iqr <- function(x) {
 #' @returns Data frame with columns "y" (center), "ymin" (lower), "ymax" (upper)
 #' @noRd
 geo_mean_plot <- function(x, error_fn = mean_ci, error_limits = "both", ...) {
-  error_fn <- match_fun(error_fn)
+  error_fn <- match.fun(error_fn)
   x_log <- log1p(x[!is.na(x)])
   gm_range <- error_fn(x_log, error_limits = error_limits, ...)
   expm1(gm_range)

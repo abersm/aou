@@ -80,7 +80,7 @@ anti_join_safe <- function(df1, df2, by = NULL, ...) {
 #' @export
 join_many <- function(..., join_fn = dplyr::left_join, by = NULL) {
   dfs <- list(...)
-  join_fn <- match_fun(join_fn)
+  join_fn <- match.fun(join_fn)
   purrr::reduce(dfs, join_fn, by = by)
 }
 

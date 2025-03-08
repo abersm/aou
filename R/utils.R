@@ -1,14 +1,83 @@
-# Edit lists --------------------------------------------------------------
+#' Move columns
+#'
+#' @noRd
+move_cols <- function(.df, ..., .before = NULL, .after = NULL) {
+  cols <- names(Select(.df, ...))
+  idx <- seq_along(.df)
+  names(idx) <- all_cols <- names(.df)
+  if (!is.null(.before)) {
+    if (!is.null(.after))
+      Stop("In 'move_cols', either '.before' or '.after' can be specified, but not both")
+    .before <- Setdiff(.before, cols)
+    first_part <- all_cols[idx < idx[.before]]
+    first_part <- Setdiff(first_part, cols)
+    .df[c(first_part, cols, .before, Setdiff(all_cols, c(first_part, cols, .before)))]
+  } else if (!is.null(.after)) {
+    .after <- Setdiff(.after, cols)
+    last_part <- all_cols[idx > idx[.after]]
+    last_part <- Setdiff(last_part, cols)
+    .df[c(Setdiff(all_cols, c(.after, cols, last_part)), .after, cols, last_part)]
+  } else {
+    .df[c(cols, Setdiff(all_cols, cols))]
+  }
+}
+
+#' Determine if a variable if constant
+#'
+#' @noRd
+is_constant <- function(x, na.rm = FALSE) {
+  x <- unique(x)
+  if (na.rm) {
+    x <- x[!is.na(x)]
+  }
+  length(x) < 2L
+}
+
+#' Empty data frame
+#'
+#' @noRd
+empty_df <- function(..., df_template = NULL) {
+  if (!is.null(df_template))
+    return(df_template[FALSE, ])
+  if (n_dots(...) == 0L) {
+    structure(list(), class = "data.frame", row.names = integer(), names = character())
+  } else {
+    df <- list(...)
+    class(df) <- "data.frame"
+    attr(df, "row.names") <- integer()
+    df
+  }
+}
+
+#' Remove file extension
+#'
+#' @noRd
+str_remove_ext <- function(x) sub("\\.[^.]+$", "", x)
+
+#' Create a safe file path
+#'
+#' @noRd
+.safe_file_path <- function(file_name, ext, directory = desktop_path()) {
+  file_name <- str_remove_ext(file_name)
+  file_name <- gsub("(\\\\|/|\\$|\\?|%)+", " ", file_name)
+  file_name <- gsub("^[^[:alnum:]]+|[^[:alnum:]]+$|\\(|\\)|\\[|\\]", "", file_name)
+  if (file_name == "") {
+    today <- floor(unclass(Sys.time())/86400)
+    class(today) <- "Date"
+    file_name <- sprintf("file_%s", format(today, "%Y_%m_%d"))
+  }
+  dir_files <- str_remove_ext(list.files(path = directory, pattern = sprintf("\\.%s$", ext), ignore.case = TRUE))
+  file_name <- make.unique(c(dir_files, file_name), sep = "_")
+  file_name <- file_name[length(file_name)]
+  paste(gsub("/+$", "", directory), paste(file_name, ext, sep = "."), sep = "/")
+}
 
 #' Remove NULL values from a list
 #'
 #' @param x List
 #' @returns List without `NULL` or other length 0 elements
 #' @export
-remove_null <- function(x) {
-  #x[!vapply(x, function(z) length(z) == 0, FUN.VALUE = logical(1), USE.NAMES = FALSE)]
-  x[lengths(x, use.names = FALSE) > 0L]
-}
+remove_null <- function(x) x[lengths(x, use.names = FALSE) > 0L]
 
 #' Update list
 #'
@@ -35,45 +104,7 @@ update_list <- function(old, new) {
 #' @param x List
 #' @returns List
 #' @noRd
-transpose <- function(x) {
-  # do.call(mapply, c(FUN = c, x, USE.NAMES = TRUE, SIMPLIFY = simplify))
-  do.call(Map, c(c, x, USE.NAMES = TRUE))
-}
-
-#' Silently load 1 or more packages
-#'
-#' @param ... Enter comma separated list of unquoted or quoted package names without `c()`
-#' @export
-lib <- function(...) {
-  pkg_required("cli")
-  pkg_required("crayon")
-  pkgs <- dots_as_quoted(...)
-  not_installed <- pkgs[pkgs %!in% pkg_installed()]
-  if (length(not_installed) == 0L) {
-    lapply(pkgs, function(x) tryNULL(suppressWarnings(suppressPackageStartupMessages(library(x, character.only = TRUE)))))
-    z <- if (length(pkgs) == 1L) sprintf("%s already installed!", pkgs) else "All packages already installed!"
-    return(cli::cli_alert_success(crayon::green(z)))
-  }
-  if (any(idx_github <- grepl("/", not_installed, fixed = TRUE))) {
-    pkg_required("devtools")
-    lapply(not_installed[idx_github], function(x) invisible(devtools::install_github(x)))
-    not_installed <- not_installed[!idx_github]
-  }
-  if (length(not_installed) > 0) {
-    z <- tryCatch(utils::install.packages(not_installed, dependencies = TRUE), warning = function(e) TRUE, error = function(e) TRUE)
-    if (!is.null(z) && z) {
-      pkg_required("BiocManager")
-      tryCatch(suppress(BiocManager::install(not_installed)), error = function(e) TRUE)
-    }
-  }
-  lapply(pkgs, function(x) tryNULL(suppressWarnings(suppressPackageStartupMessages(library(x, character.only = TRUE)))))
-  if (any(idx <- pkgs %!in% pkg_installed())) {
-    cli::cli_warn(crayon::green(sprintf("Unable to install the following packages:\n%s", .quote_collapse(pkgs[idx], sep = "\n"))))
-  } else {
-    return(cli::cli_alert_success(crayon::green("All new packages installed!")))
-  }
-  invisible(pkgs)
-}
+transpose <- function(x) do.call(Map, c(c, x, USE.NAMES = TRUE))
 
 #' Not in operator
 #'
@@ -122,54 +153,34 @@ try_map <- function(X, FUN, ..., USE.NAMES = FALSE, OTHERWISE = NULL, SILENT = T
 #' Read rds file
 #'
 #' Functionality from readr package
-#' @rdname read_r
+#' @param x Path to rds file
 #' @returns Contents of rds file
 #' @export
-read_rds <- function(file_name, ...) {
-  file_name <- get_input(file_name)
-  if (!file.exists(file_name)) {
-    dots <- dots_as_quoted(...)
-    file_name <- .get_file_path(x = file_name, ext = "rds", dots = dots, desktop = TRUE)
-  }
-  con <- file(file_name)
+read_rds <- function(x) {
+  con <- file(x)
   on.exit(close(con))
   readRDS(con, refhook = NULL)
 }
 
 #' Import rda file
 #'
-#' @rdname read_r
-#' @param file_name Name of rda file or path to file
-#' @param ... Arguments passed to `paste_path()`
-#' @returns Contents of rda file
+#' @rdname read_rds
 #' @export
-read_rda <- function(file_name, ...) {
-  file_name <- get_input(file_name)
-  if (file.exists(file_name)) {
-    file_location <- file_name
-  } else {
-    dots <- dots_as_quoted(...)
-    file_location <- .get_file_path(x = file_name, ext = "rda", dots = dots, desktop = TRUE)
-    if (is.null(file_location)) {
-      file_location <- .get_file_path(x = file_name, ext = "Rdata", dots = dots, desktop = TRUE)
-      if (is.null(file_location)) return(invisible())
-    }
-  }
+read_rda <- function(x) {
   env <- new.env()
-  load(file = file_location, envir = env)
-  get(x = str_remove_ext(basename(file_name)), envir = env)
+  load(file = x, envir = env)
+  get(x = sub("\\.[^.]+$", "", basename(x)), envir = env)
 }
 
 #' Export rda file
 #'
-#' @rdname read_r
+#' @rdname read_rds
 #' @param x Name of object in global environment to save
 #' @param file_name Name of rda file
-#' @param directory Directory where rda object will be saved. Default is `desktop_path()`
 #' @returns rda file silently exported
 #' @export
-write_rda <- function(x, file_name = NULL, directory = desktop_path()) {
-  file_name <- get_input(file_name) %||% get_input(x)
+write_rda <- function(x, file_name = NULL, directory = getwd()) {
+  file_name <- file_name %||% deparse(substitute(x))
   file_name <- str_remove_ext(file_name)
   file_path <- .safe_file_path(file_name, ext = "rda", directory = directory)
   assign(file_name, value = x)
@@ -196,4 +207,34 @@ steroid_conversion <- function(
   z <- x/z[from]*z[to]
   names(z) <- NULL
   z
+}
+
+#' Stop a function due to unrecognized input class
+#'
+#' @noRd
+.stop_input_class <- function(x, fn = .fn_called(sys.nframe() - 1)) {
+  Stop(sprintf("Unable to run '%s' with input of class ", fn), .quote_collapse(class(x)))
+}
+
+#' Single quote input and collapse with separator
+#'
+#' @noRd
+.quote_collapse <- function(x, sep = ", ") paste(shQuote(x), collapse = sep)
+
+#' Parent function called
+#'
+#' @noRd
+.fn_called <- function(n = 1) deparse(sys.call(n)[[1L]])[1L]
+
+is_odd <- function(x) x%%2 != 0
+
+is_even <- function(x) x%%2 == 0
+
+match_fun <- function(fn) {
+  if (is.function(fn)) return(fn)
+  if (!(is.character(fn) && length(fn) == 1L || is.symbol(fn))) {
+    fn <- eval.parent(substitute(substitute(fn)))
+  }
+  env <- parent.frame(2)
+  get(as.character(fn), mode = "function", envir = env)
 }

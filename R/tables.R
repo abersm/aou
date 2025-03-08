@@ -215,7 +215,7 @@ tab_2_by_2 <- function(x, ...) UseMethod("tab_2_by_2")
 #' @rdname tab_2_by_2
 #' @export
 tab_2_by_2.default <- function(x, ...) {
-  Stop(sprintf("In 'tab_2_by_2', not sure how to handle input of class %s", .quote_collapse(class(x))))
+  Stop(sprintf("In 'tab_2_by_2', not sure how to handle input of class %s", paste(shQuote(class(x)), sep = ", ")))
 }
 
 #' tab_2_by_2 - numeric
@@ -427,27 +427,8 @@ summary_table_binary <- function(
     levels <- if (inherits(y, "factor")) {
       y_levels <- attr(y, "levels")
       attr(factor(y, exclude = if (anyNA(y_levels)) NULL else NA), "levels")
-    } else if (is_genotype(y)) {
-      levels <- sort.int(unique.default(y))
-      dko <- grepl("dko", levels, ignore.case = TRUE)
-      if (any(dko)) {
-        levels <- c(levels[dko], levels[!dko])
-      }
-      ko <- grepl("ko", levels, ignore.case = TRUE)
-      if (any(ko)) {
-        levels <- c(levels[ko], levels[!ko])
-      }
-      cre_negative <- levels == "Cre-"
-      if (any(cre_negative)) {
-        levels <- c(levels[cre_negative], levels[!cre_negative])
-      }
-      wt <- grepl("wt", levels, ignore.case = TRUE)
-      if (any(wt)) {
-        levels <- c(levels[wt], levels[!wt])
-      }
-      levels
     } else {
-      unique.default(y)
+      unique(y)
     }
     paste(x, levels[2L], sep = "___")
   }, character(1))

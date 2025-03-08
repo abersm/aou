@@ -6,25 +6,19 @@
 \alias{write_rda}
 \title{Read rds file}
 \usage{
-read_rds(file_name, ...)
+read_rds(x)
 
-read_rda(file_name, ...)
+read_rda(x)
 
-write_rda(x, file_name = NULL, directory = desktop_path())
+write_rda(x, file_name = NULL, directory = getwd())
 }
 \arguments{
-\item{file_name}{Name of rda file}
-
-\item{...}{Arguments passed to \code{paste_path()}}
-
 \item{x}{Name of object in global environment to save}
 
-\item{directory}{Directory where rda object will be saved. Default is \code{desktop_path()}}
+\item{file_name}{Name of rda file}
 }
 \value{
 Contents of rds file
-
-Contents of rda file
 
 rda file silently exported
 }

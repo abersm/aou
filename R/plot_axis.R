@@ -165,7 +165,7 @@ scale_x <- function(
 #' @export
 ggplot_add.axis_clean <- function(object, plot, object_name) {
   x_or_y <- object$axis
-  axis_fn <- match_fun(sprintf("scale_%s_continuous", x_or_y))
+  axis_fn <- match.fun(sprintf("scale_%s_continuous", x_or_y))
 
   # Axis limits as length 2 numeric vector
   limits <- object$limits %||% get_plot_data_limits(plot, axis = x_or_y) %||% get_plot_axis_limits(plot, axis = x_or_y)
@@ -264,7 +264,7 @@ scale_continuous <- function(
 #' @export
 ggplot_add.axis_x10 <- function(object, plot, object_name) {
   x_or_y <- object$axis
-  axis_fn <- match_fun(sprintf("scale_%s_continuous", x_or_y))
+  axis_fn <- match.fun(sprintf("scale_%s_continuous", x_or_y))
   limits <- object$limits %W% get_plot_data_limits(plot, axis = x_or_y)
   breaks <- object$breaks
   if (is.null(breaks) || is_waiver(breaks)) {
@@ -389,7 +389,7 @@ scale_axis_clean <- function(
   ...) {
   scale <- match.arg(scale, choices = c("regular", "scientific", "log10", "log", "log2"))
   position <- position %||% if (axis == "y") "left" else "bottom"
-  axis_fn <- match_fun(sprintf("scale_%s_continuous", axis))
+  axis_fn <- match.fun(sprintf("scale_%s_continuous", axis))
 
   # Breaks
   breaks <- breaks %||% .create_axis_breaks(.limits = axis_limits, .scale = scale, .breaks_fn = breaks_fn, .n = n_breaks)

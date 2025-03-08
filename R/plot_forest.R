@@ -70,7 +70,7 @@ plot_forest <- function(
     color_var <- "color_var"
   }
   total_bands <- n_unique(df[[label_var]])
-  log_fn <- match_fun(log_scale)
+  log_fn <- match.fun(log_scale)
   if (scale != "log") {
     x_min <- x_min %||% floor(Min(df[[risk_lower]]))
     x_max <- x_max %||% ceiling(Max(df[[risk_upper]]))
@@ -80,13 +80,13 @@ plot_forest <- function(
     x_max <- x_max %||% (10^(ceiling(log_fn(Max(df[[risk_upper]])))))
     x_breaks <- (scales::trans_breaks(log_scale, function(x) 10^x))(c(x_min, x_max))
     x_breaks <- x_breaks[log_fn(x_breaks) %% 1 == 0]
-    x_label_fn <- x_label_fn %||% match_fun(log_scale)
+    x_label_fn <- x_label_fn %||% match.fun(log_scale)
   } else {
     x_min <- x_min %||% (2^(floor(log_fn(Min(df[[risk_lower]])))))
     x_max <- x_max %||% (2^(ceiling(log_fn(Max(df[[risk_upper]])))))
     x_breaks <- (scales::trans_breaks(log_scale, function(x) 2^x))(c(x_min, x_max))
     x_breaks <- x_breaks[log_fn(x_breaks) %% 1 == 0]
-    x_label_fn <- x_label_fn %||% match_fun(log_scale)
+    x_label_fn <- x_label_fn %||% match.fun(log_scale)
   }
   if (is.null(n_bands) && !is.null(add_n_bands)) {
     total_bands <- total_bands + add_n_bands

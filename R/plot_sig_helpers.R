@@ -361,7 +361,7 @@
   compare_levels <- function(i, j) {
     delta <- abs(mean_ranks[i] - mean_ranks[j])
     z <- (z/group_size[i] + z/group_size[j])
-    2*pnorm(abs(delta/sqrt(z)), lower.tail = FALSE)
+    2*stats::pnorm(abs(delta/sqrt(z)), lower.tail = FALSE)
   }
   df_pval <- purrr::pmap_dfr(.combos_1_vec_as_df(unique_groups, n = 2), ~{
     list(Group1 = .x, Group2 = .y, p = compare_levels(.x, .y), y = max(y_rel_max[c(.x, .y)]))
@@ -525,7 +525,7 @@
     dplyr::select(-data) |>
     tidyr::unnest(p) |>
     dplyr::ungroup()
-  df_pvalues <- df_pvalues[complete.cases(df_pvalues), ]
+  df_pvalues <- df_pvalues[stats::complete.cases(df_pvalues), ]
   df_pvalues$x <- .dodge_x_position(x = df_pvalues$x, n_groups = n_groups, dodge = dodge) + df_pvalues$x_var
   df_pvalues$xend <- .dodge_x_position(x = df_pvalues$xend, n_groups = n_groups, dodge = dodge) + df_pvalues$x_var
   df_names <- names(df_pvalues)

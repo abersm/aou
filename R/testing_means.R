@@ -322,7 +322,7 @@ p_anova <- function(
   df <- remove_na(df, c(if (na.rm) x, y))
   x_values <- .subset2(df, x)
   g <- df[[x]] <- if (is.factor(x_values)) .droplevels(x_values, na.rm = na.rm) else factor(x_values)
-  variance_test <- match_fun(variance_test)
+  variance_test <- match.fun(variance_test)
   welch <- welch %||% (variance_test(df = df, formula = formula, otherwise = 0) < 0.05)
   y <- .subset2(df, y)
   n_groups <- length(attr(g, "levels"))

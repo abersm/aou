@@ -15,11 +15,7 @@ insert_subset_pipe <- function() rstudioapi::insertText(" %in% ")
 insert_section_title <- function() {
   highlighted_text <- rstudioapi::getActiveDocumentContext()
   line_number <- highlighted_text$selection[[1L]]$range$start["row"]
-  text <- if (!is.null(highlighted_text) && highlighted_text$selection[[1L]]$text != "") {
-    highlighted_text$selection[[1L]]$text
-  } else {
-    paste_clipboard()
-  }
+  text <- highlighted_text$selection[[1L]]$text
   text <- text %||% ""
   text <- trimws(text)
   text <- gsub("\n", "", text, fixed = TRUE)

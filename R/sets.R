@@ -5,7 +5,7 @@
 #' @returns Vector or list
 #' @export
 interleave <- function(..., coerce_fn = as.character) {
-  z <- lapply(list(...), match_fun(coerce_fn))
+  z <- lapply(list(...), match.fun(coerce_fn))
   n_args <- length(z)
   if (n_args < 2L) return(c(...))
   z <- lapply(z, rep, length.out = max(lengths(z, use.names = FALSE), na.rm = TRUE))

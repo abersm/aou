@@ -10,6 +10,7 @@ RoxygenNote: 7.3.2
 Imports:
     allofus,
     bigrquery,
+    ggplot2,
     grid,
     gtable,
     job,
