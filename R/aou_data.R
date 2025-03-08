@@ -2,16 +2,13 @@
 #'
 #' @param patients,pneumonia,cv_complications If `TRUE` (default), data frame is loaded
 #' @param other Other data frames to load. Enter as character vector. Options: `"demographics"`, `"comorbidities"`, `"substance_use"`. Default includes all
-#' @param background If `TRUE` (default), data loaded as background job
 #' @returns List of data frames
 #' @export
 load_df <- function(
     patients = TRUE,
     pneumonia = TRUE,
     cv_complications = TRUE,
-    other = c("demographics", "comorbidities", "substance_use"),
-    background = TRUE) {
-  fn <- if (background) job::job else identity
+    other = c("demographics", "comorbidities", "substance_use")) {
   names <- c(
     if (patients) "patients",
     if (pneumonia) "pneumonia",
@@ -27,11 +24,9 @@ load_df <- function(
   )
   sql <- paste0("sql_", names)
   types <- unname(lookup[names])
-  fn({
-    out <- lapply(seq_along(names), function(i) aou::write_raw_data(eval(sql[i]), filename = names[i], type = types[i]))
-    names(out) <- names
-    out
-  })
+  out <- lapply(seq_along(names), function(i) aou::write_raw_data(eval(sql[i]), filename = names[i], type = types[i]))
+  names(out) <- names
+  out
 }
 
 #' Move object from workspace to bucket

@@ -13,7 +13,6 @@ Imports:
     ggplot2,
     grid,
     gtable,
-    job,
     purrr,
     rlang,
     scales,
