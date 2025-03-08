@@ -1670,7 +1670,7 @@ sql_inflammatory_markers <- "
 # LDL/A1c -----------------------------------------------------------------
 
 # type: measurement
-sql_lipis_a1c <- "
+sql_lipids_a1c <- "
     SELECT
         measurement.person_id,
         measurement.measurement_concept_id,
