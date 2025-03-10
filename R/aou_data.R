@@ -207,3 +207,56 @@ col_types <- function(x) {
     }
   )
 }
+
+#' Move file from workspace to bucket for permanent storage
+#'
+#' @param file File in workspace
+#' @returns File silently exported
+#' @export
+aou_workspace_to_bucket <- function(file, directory = FALSE, bucket = getOption("aou.default.bucket")) {
+  file <- gsub(" ", "_", file)
+  tmp <- tempdir()
+  tmp_log <- file.path(tmp, "cp.log")
+  gsutil_args <- paste("-L", tmp_log)
+  if (directory) {
+    gsutil_args <- paste("-r", gsutil_args)
+  }
+  for (i in seq_along(file)) {
+    system(paste("gsutil cp", gsutil_args, file[i], bucket), intern = TRUE)
+  }
+  if (length(read.csv(tmp_log)$Destination) == 0L) {
+    cli::cli_inform(c(`!` = "Oops! No files were copied"))
+  } else {
+    cli::cli_inform(c(v = "Saved to bucket:", paste(gsub(paste0(bucket, "/"), "", read.csv(tmp_log)$Destination), collapse = "\n")))
+  }
+  invisible(file.remove(tmp_log))
+}
+
+#' Move file from bucket to workspace
+#'
+#' @param file File in bucket
+#' @returns File silently exported
+#' @export
+aou_bucket_to_workspace <- function(file, directory = FALSE, bucket = getOption("aou.default.bucket")) {
+  bucket_files <- allofus::aou_ls_bucket(silent = TRUE)
+  missing_files <- list()
+  if (directory) {
+    file <- paste0(file, "/:")
+    gs_args <- "gsutil cp -r "
+  } else {
+    gs_args <- "gsutil cp "
+  }
+  for (i in seq_along(file)) {
+    if (!(file[i] %in% bucket_files)) {
+      missing_files <- append(missing_files, file[i])
+    } else {
+      system(paste0(gs_args, bucket, "/", file[i], " ."), intern = TRUE)
+      cli::cli_inform(c(v = "Retrieved ", file[i], " from bucket."))
+    }
+  }
+  if (length(missing_files) != 0L) {
+    missing <- paste0(unlist(missing_files), collapse = ", ")
+    cli::cli_inform(c(`!` = paste0(missing, " not found in bucket.")))
+  }
+}
+

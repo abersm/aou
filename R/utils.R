@@ -246,3 +246,17 @@ tryElse <- function(x, otherwise = NULL, silent = TRUE) {
     tryCatch(x, error = function(e) otherwise)
   }
 }
+
+#' Install and load package from cran
+#'
+#' @param package Name of package. Enter as length 1  character vector
+#' @param ... Arguments passed to `require`
+#' @returns Packages silently loaded
+#' @export
+install_if_missing_then_load <- function(package, ...) {
+  if (!require(package, ...)) {
+    install.packages(package, verbose = FALSE)
+  }
+  require(package, quietly = TRUE, ...)
+}
+
