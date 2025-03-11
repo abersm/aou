@@ -10,3 +10,6 @@ ls_bucket <- function(...) {
 ls_workspace <- function(...) {
   allofus::aou_ls_workspace(...)
 }
+
+#' Table columns
+

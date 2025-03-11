@@ -33,3 +33,4 @@ Depends:
     R (>= 4.2.1)
 Config/testthat/edition: 3
 StagedInstall: no
+LazyData: true

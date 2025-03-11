@@ -1,5 +1,34 @@
 #' Load data from workbench using SQL
 #'
+#' @param sql SQL query. Enter as length 1 character vector
+#' @param filename Name for output csv file. Enter as length 1 character vector
+#' @param type Type of data from All of Us. Options: `"conditions"`, `"person"`, `"surveys"`, `"procedures"`, `"measurements"`, `"drugs"`, `"procedures"`
+#' @returns List containing "df" (data frame) and "file" (path to csv file in workspace)
+#' @export
+sql2df <- function(sql, filename = type, type = NULL) {
+  types <- c(
+    patients = "person",
+    pneumonia = "conditions",
+    cv_complications = "conditions",
+    demographics = "surveys",
+    comorbidities = "conditions",
+    substance_use = "surveys",
+    inflammatory_markers = "measurements",
+    lipids_a1c = "measurements",
+    bcx = "measurements",
+    sputum_uag = "measurements"
+  )
+  type <- type %||% guess_sql_query_type(sql)
+  file_path <- file.path(Sys.getenv("WORKSPACE_BUCKET"), "bq_exports", Sys.getenv("OWNER_EMAIL"), filename, paste0(filename, "_*.csv"))
+  bigrquery::bq_table_save(bigrquery::bq_dataset_query(Sys.getenv("WORKSPACE_CDR"), query = sql, billing = Sys.getenv("GOOGLE_PROJECT")), file_path, destination_format = "CSV")
+  list(
+    df = read_raw_data(file_path, type),
+    file = file_path
+  )
+}
+
+#' Load data from workbench using SQL
+#'
 #' @param patients,pneumonia,cv_complications If `TRUE` (default), data frame is loaded
 #' @param other Other data frames to load. Enter as character vector. Options: `"demographics"`, `"comorbidities"`, `"substance_use"`, `"inflammatory_markers"`, `"lipids_a1c"`, `"bcx"`, `"sputum_uag"`. Default includes 1st 3
 #' @returns List of data frames
@@ -39,7 +68,7 @@ load_df <- function(
     bcx = sql_bcx,
     sputum_uag = sql_sputum_uag
   )
-  out <- lapply(names, function(x) tryElse(aou::write_raw_data(sql[x], filename = x, type = types[x]), otherwise = "Error"))
+  out <- lapply(names, function(x) tryElse(write_raw_data(sql[x], filename = x, type = types[x]), otherwise = "Error"))
   names(out) <- names
   out
 }

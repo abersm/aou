@@ -257,6 +257,30 @@ install_if_missing_then_load <- function(package, ...) {
   if (!require(package, ...)) {
     install.packages(package, verbose = FALSE)
   }
-  require(package, quietly = TRUE, ...)
+  library(package, character.only = TRUE, quietly = TRUE, ...)
 }
 
+#' Load packages from cran
+#'
+#' @rdname install_if_missing_then_load
+#' @export
+Lib <- function(
+    ...,
+    lib.loc = NULL,
+    warn.conflicts,
+    mask.ok,
+    exclude,
+    include.only,
+    attach.required = missing(include.only)) {
+  x <- unlist(lapply(eval(substitute(alist(...))), function(x) {
+    gsub("\"", "", deparse(x, width.cutoff = 500L))
+  }), use.names = FALSE)
+  idx <- x[!(paste0("package:", x) %in% search())]
+  for (i in idx) {
+    z <- tryCatch(suppressWarnings(suppressMessages(library(i, lib.loc = lib.loc, character.only = TRUE, logical.return = TRUE, warn.conflicts = warn.conflicts, quietly = TRUE, mask.ok = mask.ok, exclude = exclude, include.only = include.only, attach.required = attach.required))), error = function(e) FALSE)
+    if (!z) {
+      suppressWarnings(suppressMessages(install.packages(x, quiet = TRUE, verbose = FALSE)))
+      tryCatch(suppressWarnings(suppressMessages(library(x, lib.loc = lib.loc, character.only = TRUE, logical.return = TRUE, warn.conflicts = warn.conflicts, quietly = TRUE, mask.ok = mask.ok, exclude = exclude, include.only = include.only, attach.required = attach.required))), error = function(e) FALSE)
+    }
+  }
+}

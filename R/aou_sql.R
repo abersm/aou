@@ -1892,6 +1892,103 @@ sql_lipids_a1c <- "
 
 # type: drugs
 
+sql_statin <- "
+    SELECT
+        d_exposure.PERSON_ID,
+        d_exposure.ROUTE_SOURCE_VALUE,
+        d_exposure.DRUG_CONCEPT_ID,
+        d_exposure.DRUG_EXPOSURE_START_DATETIME,
+        d_exposure.SIG,
+        d_exposure.ROUTE_CONCEPT_ID,
+        d_exposure.DRUG_SOURCE_CONCEPT_ID,
+        d_exposure.DRUG_SOURCE_VALUE,
+        d_exposure.LOT_NUMBER,
+        d_exposure.VERBATIM_END_DATE,
+        d_exposure.REFILLS,
+        d_exposure.DAYS_SUPPLY,
+        d_exposure.DOSE_UNIT_SOURCE_VALUE,
+        d_exposure.QUANTITY,
+        d_exposure.DRUG_TYPE_CONCEPT_ID,
+        d_exposure.VISIT_OCCURRENCE_ID,
+        d_exposure.STOP_REASON,
+        d_exposure.DRUG_EXPOSURE_END_DATETIME,
+        d_route.concept_name as ROUTE_CONCEPT_NAME,
+        d_type.concept_name as DRUG_TYPE_CONCEPT_NAME,
+        d_standard_concept.concept_code as STANDARD_CONCEPT_CODE,
+        d_standard_concept.concept_name as STANDARD_CONCEPT_NAME,
+        d_standard_concept.vocabulary_id as STANDARD_VOCABULARY,
+        d_source_concept.vocabulary_id as SOURCE_VOCABULARY,
+        d_source_concept.concept_name as SOURCE_CONCEPT_NAME,
+        d_source_concept.concept_code as SOURCE_CONCEPT_CODE,
+        d_visit.concept_name as VISIT_OCCURRENCE_CONCEPT_NAME
+    from
+        ( SELECT
+            *
+        from
+            `drug_exposure` d_exposure
+        WHERE
+            (
+                drug_concept_id in  (
+                    select
+                        distinct ca.descendant_id
+                    from
+                        `cb_criteria_ancestor` ca
+                    join
+                        (
+                            select
+                                distinct c.concept_id
+                            from
+                                `cb_criteria` c
+                            join
+                                (
+                                    select
+                                        cast(cr.id as string) as id
+                                    from
+                                        `cb_criteria` cr
+                                    where
+                                        domain_id = 'DRUG'
+                                        and is_standard = 1
+                                        and concept_id in (
+                                            1545958, 1551860, 1549686, 1510813, 1592085, 40165636, 1539403, 1592180
+                                        )
+                                        and is_selectable = 1
+                                        and full_text like '%[drug_rank1]%'
+                                ) a
+                                    on (
+                                        c.path like concat('%.',
+                                    a.id,
+                                    '.%')
+                                    or c.path like concat('%.',
+                                    a.id))
+                                where
+                                    domain_id = 'DRUG'
+                                    and is_standard = 1
+                                    and is_selectable = 1
+                                ) b
+                                    on (
+                                        ca.ancestor_id = b.concept_id
+                                    )
+                            )
+                        )
+                ) d_exposure
+        LEFT JOIN
+            `concept` d_route
+                on d_exposure.ROUTE_CONCEPT_ID = d_route.CONCEPT_ID
+        LEFT JOIN
+            `concept` d_type
+                on d_exposure.drug_type_concept_id = d_type.CONCEPT_ID
+        left join
+            `concept` d_standard_concept
+                on d_exposure.DRUG_CONCEPT_ID = d_standard_concept.CONCEPT_ID
+        LEFT JOIN
+            `concept` d_source_concept
+                on d_exposure.DRUG_SOURCE_CONCEPT_ID = d_source_concept.CONCEPT_ID
+        left join
+            `visit_occurrence` v
+                on d_exposure.VISIT_OCCURRENCE_ID = v.VISIT_OCCURRENCE_ID
+        LEFT JOIN
+            `concept` d_visit
+                on v.VISIT_CONCEPT_ID = d_visit.CONCEPT_ID"
 
 # Steroids ----------------------------------------------------------------
 
