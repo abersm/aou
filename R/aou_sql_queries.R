@@ -40,9 +40,9 @@
   }
   files <- system2("gcloud", args = c("storage ls", dest), stdout = TRUE, stderr = TRUE)
   f <- basename(files)
-  system(paste0(c("gcloud storage cp ", files, "."), collapse = " "), intern = T)
+  system(paste0(c("gcloud storage cp ", files, "."), collapse = " "), intern = TRUE)
   dat_list <- lapply(f, data.table::fread)
-  lapply(f, dest.remove)
+  lapply(f, file.remove)
   res <- data.table::rbindlist(dat_list)
   if (rm_csv) {
     system(stringr::str_glue("gsutil rm {output_folder}*"), intern = TRUE)
