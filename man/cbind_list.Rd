@@ -15,14 +15,3 @@ Data frame with elements of input list (vectors) forming columns of output data 
 \description{
 Opposite of \code{as.list.data.frame}
 }
-\examples{
-\dontrun{
-## Identical to data.frame(a = 1:3, b = 4:6)
-# cbind_list(list(a = 1:3, b = 4:6))
-## Identical to data.frame(a = 1:3, b = 4:9)
-# cbind_list(list(a = 1:3, b = 4:9))
-## Results in error: same as data.frame(a = 1:3, b = 4:8)
-# cbind_list(list(a = 1:3, b = 4:8))
-}
-
-}

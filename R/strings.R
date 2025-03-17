@@ -16,26 +16,11 @@ str_contains <- function(x, pattern, ignore_case = FALSE, invert = FALSE, ...) {
 #'
 #' @rdname str_contains
 #' @returns Logical vector with same length as input (unless `x` is logical in which case, output is `FALSE`)
-#' @export
+#' @noRd
 can_be_numeric <- function(x) {
   if (is.logical(x)) return(FALSE)
   is.na(x) | !is.na(suppressWarnings(as.numeric(x)))
 }
-
-#' Count number of occurrences of substring
-#'
-#' @rdname str_contains
-#' @returns Integer vector with same length as input
-#' @export
-str_count <- function(x, pattern, ignore_case = FALSE, ...) {
-  vapply(gregexpr(pattern, x, ignore.case = ignore_case, ...), function(y) sum(y > 0, na.rm = TRUE), integer(1), USE.NAMES = FALSE)
-}
-
-#' Count number of words in a string
-#'
-#' @rdname str_count
-#' @export
-str_count_words <- function(x) str_count(x, "\\w+")
 
 # Replace -----------------------------------------------------------------
 
@@ -67,22 +52,10 @@ mgsub <- function(x, pattern, replacement, ..., .sub_fn = gsub) {
 
 # Remove ------------------------------------------------------------------
 
-#' Remove a pattern from a string
-#'
-#' @param x Character vector
-#' @param pattern Pattern to remove from `x`. Enter as length 1 character vector
-#' @param all If `TRUE` (default), all occurrences of `pattern` will be removed. If `FALSE`, only first occurrence of `pattern` will be removed
-#' @param ... Arguments passed to `sub` or `gsub`
-#' @returns Character vector with same length as input
-#' @export
-str_remove <- function(x, pattern, all = TRUE, ...) {
-  sub_fn <- if (all) gsub else sub
-  sub_fn(pattern, "", x = x, ...)
-}
-
 #' Remove numbers from a string
 #'
-#' @rdname str_remove
+#' @param x Character vector
+#' @param all If `TRUE` (default), all occurrences of `pattern` will be removed. If `FALSE`, only first occurrence of `pattern` will be removed
 #' @export
 str_remove_numerics <- function(x, all = TRUE) {
   fn <- if (all) gsub else sub
@@ -91,44 +64,33 @@ str_remove_numerics <- function(x, all = TRUE) {
 
 #' Remove letters from string
 #'
-#' @rdname str_remove
+#' @rdname str_remove_numerics
 #' @param case Case of letters to be removed. Options: `"both"` (default), `"lower"`, `"upper"`
 #' @export
 str_remove_letters <- function(x, case = "both", all = TRUE) {
   pattern <- switch(case, lower = "[a-z]", upper = "[A-Z]", all = , "[[:alpha:]]")
-  str_remove(x, pattern = pattern, all = all)
-}
-
-#' Wrapper for trimws
-#'
-#' @rdname str_remove
-#' @param side Side of string to remove spaces. Options: `"both"` (default), `"left"`, `"right"`
-#' @export
-str_trimws <- function(x, side = c("both", "left", "right")) {
-  side <- match.arg(side, choices = c("both", "left", "right"))
-  switch(
-    side,
-    left = sub("^[ \t\r\n]+", "", x, perl = TRUE),
-    right = sub("[ \t\r\n]+$", "", x, perl = TRUE),
-    both = sub("[ \t\r\n]+$", "", sub("^[ \t\r\n]+", "", x, perl = TRUE), perl = TRUE)
-  )
+  if (all) {
+    gsub(pattern, "", x = x)
+  } else {
+    sub(pattern, "", x = x)
+  }
 }
 
 #' Remove all spaces (not just at ends of string)
 #'
-#' @rdname str_remove
+#' @rdname str_remove_numerics
 #' @export
 str_remove_space <- function(x) gsub("\\s+", "", x)
 
 #' Convert multiple spaces to single space
 #'
-#' @rdname str_remove
+#' @rdname str_remove_numerics
 #' @export
 str_remove_multi_space <- function(x) gsub("[ \t\r\n]+", " ", x)
 
 #' Remove substring before a given pattern (i.e. pattern retained in output)
 #'
-#' @rdname str_remove
+#' @rdname str_remove_numerics
 #' @param name description
 #' @param fixed If `TRUE` (default), `escape_regex` will be applied to `pattern` before running `sub` or `gsub`
 #' @export
@@ -142,7 +104,7 @@ str_remove_before <- function(x, pattern, fixed = TRUE, all = FALSE) {
 
 #' Remove substring before a given pattern (i.e. pattern retained in output)
 #'
-#' @rdname str_remove
+#' @rdname str_remove_numerics
 #' @param fixed If `TRUE` (default), `escape_regex` will be applied to `pattern` before running `sub` or `gsub`
 #' @export
 str_remove_after <- function(x, pattern, fixed = TRUE, all = FALSE) {

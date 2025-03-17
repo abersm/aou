@@ -37,17 +37,3 @@ Cross table +/- rows and columns for totals
 \description{
 Same as \code{xtab} but option to include row/column totals
 }
-\examples{
-\dontrun{
-# covid |> xtab(death, gender)
-# covid |> x_table(death, gender) # Output same as above
-# table(covid$death, covid$gender) # Output same as above but names(dimnames(x)) is NULL
-}
-
-\dontrun{
-# covid |> x_table(death, gender)
-# covid |> xtab(death, gender) # Output same as above
-# table(covid$death, covid$gender) # Output same as above but names(dimnames(x)) is NULL
-}
-
-}

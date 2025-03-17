@@ -12,127 +12,20 @@ set_names <- function(x, names = x) {
   x
 }
 
-#' Create named list where elements of list are also the names of list
-#'
-#' named_list("a", "b") is equivalent to list(a = "a", b = "b")
-#' @param ... Comma separated list of quoted variables
-#' @returns Named list
-#' @noRd
-named_list <- function(...) {
-  env <- parent.frame(n = 1)
-  dots <- as.list(substitute(list(...)))[-1L]
-  n_args <- length(dots)
-  arg_names <- names(dots)
-  z <- character(n_args)
-  for (i in seq_len(n_args)) {
-    m <- if (i <= length(arg_names) && nchar(arg_names[[i]]) > 0L) arg_names[[i]] else dots[[i]]
-    z[[i]] <- as.character(m)
-  }
-  values <- vector(mode = "list", n_args)
-  for (i in seq_len(n_args)) {
-    k <- eval(dots[[i]], envir = env, enclos = env)
-    if (!is.null(k)) {
-      values[[i]] <- k
-    }
-  }
-  names(values) <- z
-  values
-}
-
-# Edit names --------------------------------------------------------------
-
-#' Swap values with names or vice versa
-#'
-#' @param x Named vector
-#' @returns Vector with names of `x` now forming values of output vector and values of `x` now forming names of output vector
-#' @export
-swap_names_vals <- function(x) {
-  values <- names(x)
-  if (is.null(values)) Stop("Input to 'swap_names_vals' must be a named vector")
-  names(values) <- x
-  values
-}
-
 # Information about names -------------------------------------------------
-
-#' Determine whether each elements is named
-#'
-#' @param x List or vector
-#' @returns Logical vector with same length as input
-#' @export
-is_named <- function(x) {
-  x_names <- names(x)
-  if (is.null(x_names)) return(rep(FALSE, length(x)))
-  !is.na(x_names) & nzchar(x_names)
-}
-
-#' Determine whether any elements are named
-#'
-#' @param x List or vector
-#' @returns Length 1 logical vector
-#' @export
-any_named <- function(x) {
-  x_names <- names(x)
-  if (is.null(x_names)) {
-    FALSE
-  } else if (any(nzchar(x_names))) {
-    TRUE
-  } else if (all(is.na(x_names))) {
-    FALSE
-  } else {
-    TRUE
-  }
-}
-
-#' Alias for `any_named`
-#'
-#' @rdname any_named
-#' @export
-has_names <- any_named
 
 #' Determine whether all elements are named
 #'
 #' @param x List or vector
 #' @returns Logical of length 1
-#' @export
-all_named <- function(x) all(is_named(x))
-
-#' Determine whether names contain a specified pattern
-#'
-#' Equivalent to `grepl(pattern, names(x))`
-#' @param x Data frame, matrix, list, or named vector
-#' @param pattern Pattern in `names(x)` to search
-#' @param invert If `TRUE`, search will be performed for names of `x` that do not contain `pattern`. Equivalent of `!name_contains(x)`
-#' @param ignore_case If `FALSE` (default), case of both `names(x)` and `pattern` are ignored in search. If `TRUE`, case used in `names(x)` and `pattern` must match
-#' @param ... Arguments passed to `str_contains`
-#' @returns Logical vector with length equal to `length(x)` (or `ncol(x)` if `x` is a matrix)
-#' @export
-name_contains <- function(x, pattern, invert = FALSE, ignore_case = FALSE, ...) {
-  x_names <- if (is.matrix(x)) {
-    colnames(x)
-  } else {
-    names(x)
-  }
-  str_contains(x_names, pattern = pattern, invert = invert, ignore_case = ignore_case, ...)
-}
-
-#' Get subset of names which contain a specified pattern
-#'
-#' @inheritParams name_contains
-#' @returns Character vector containing names that contain `pattern`. If no matches found, output has length 0
-#' @export
-names_which <- function(x, pattern, ignore_case = FALSE, ...) {
-  x_names <- if (is.matrix(x)) {
-    colnames(x)
-  } else {
-    names(x)
-  }
-  x_names <- x_names[grepl(pattern, x_names, ignore.case = ignore_case, ...)]
-  if (length(x_names) == 0L) character(0) else x_names
+#' @noRd
+all_named <- function(x) {
+  x_names <- names(x)
+  if (is.null(x_names)) return(rep(FALSE, length(x)))
+  all(!is.na(x_names) & nzchar(x_names))
 }
 
 # Helpers -----------------------------------------------------------------
-
 
 #' Clean column names for data frame
 #'

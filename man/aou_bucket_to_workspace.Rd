@@ -7,7 +7,7 @@
 aou_bucket_to_workspace(
   file,
   directory = FALSE,
-  bucket = getOption("aou.default.bucket")
+  bucket = Sys.getenv("WORKSPACE_BUCKET")
 )
 }
 \arguments{

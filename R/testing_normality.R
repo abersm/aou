@@ -84,9 +84,7 @@ p_ks <- function(x, otherwise = 0) tryCatch(stats::ks.test(x)$p.value, error = f
 
 #' Determine whether values in 2 groups are both normally distributed
 #'
-#' @inheritParams compare_means
-#' @returns Length 1 logical vector. `TRUE` if normally distributed (all P >= 0.05), `FALSE` if not normally distributed (any P < 0.05)
-#' @export
+#' @noRd
 is_normal <- function(df, formula = NULL, y = NULL, x = NULL, normality_test = p_shapiro, ...) {
   if (!is.null(formula)) {
     y <- all.vars(formula)

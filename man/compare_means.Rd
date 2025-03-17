@@ -46,8 +46,3 @@ Data frame
 \description{
 Compare continuous variable between 2 groups
 }
-\examples{
-# compare_means(covid, wbc ~ death, gender)
-# compare_means(covid, wbc ~ death, "gender")
-
-}

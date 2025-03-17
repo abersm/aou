@@ -15,7 +15,11 @@ convert <- function(x, from, to, pt_per_in = 72.27) {
     if (to %!in% size_units) {
       Stop(sprintf("In 'convert', when 'from = %s', 'to' must be one of the following: %s. Currently, 'to = %s'", .quote_collapse(size_units), from, to))
     }
-    .convert_size(x, from = from, to = to, pt_per_in = pt_per_in)
+    z <- c(1, 2.54, 25.4, pt_per_in, pt_per_in, 5, 25.4/0.75, 0.1130298)
+    names(z) <- c("inches", "cm", "mm", "pts", "points", "lines", "linewidth", "npc")
+    z <- x/z[from]*z[to]
+    names(z) <- NULL
+    z
   } else if (from %in% (temp_units <- c("C", "F"))) {
     if (to %!in% temp_units) {
       Stop(sprintf("In 'convert', when 'from = %s', 'to' must be either 'C' or 'F'. Currently, 'to = %s'", from, to))
@@ -39,75 +43,6 @@ convert <- function(x, from, to, pt_per_in = 72.27) {
       x
     }
   }
-}
-
-#' Convert graphical size units
-#'
-#' @param x Numeric vector of starting sizes. Units of `x` specified in `from` argument
-#' @param from Units for `x`. Options: `"inches"`, `"cm"`, `"mm"`, `"pts"`, `"points"`, `"lines"`, `"linewidth"`, `"npc"`. Enter as length 1 character vector
-#' @param to Desired output units. Same options as `from`. Enter as length 1 character vector
-#' @param pt_per_in Points per inch. Default is `72.27` (used by ggplot2). PowerPoint uses 72.009. Enter as length 1 numeric vector
-#' @returns Numeric vector expressed in units determined by `to` argument
-#' @noRd
-.convert_size <- function(x, from, to, pt_per_in = 72.27) {
-  z <- c(1, 2.54, 25.4, pt_per_in, pt_per_in, 5, 25.4/0.75, 0.1130298)
-  names(z) <- c("inches", "cm", "mm", "pts", "points", "lines", "linewidth", "npc")
-  z <- x/z[from]*z[to]
-  names(z) <- NULL
-  z
-}
-
-#' Convert distance units
-#'
-#' @param x Numeric vector of starting distances. Units of `x` specified in `from` argument
-#' @param from Units for `x`. Options: `"m"`, `"in"`, `"ft"`, `"yd"`, `"mile"`. Enter as length 1 character vector
-#' @param to Desired output units. Same options as `from`. Enter as length 1 character vector
-#' @returns Numeric vector expressed in units determined by `to` argument
-#' @noRd
-.convert_distance <- function(x, from, to) {
-  z <- c(1, 0.254, 3.048, 0.9144, 1609.344)
-  names(z) <- c("m", "in", "ft", "yd", "mile")
-  z <- x/z[from]*z[to]
-  names(z) <- NULL
-  z
-}
-
-#' Convert volume units
-#'
-#' @param x Numeric vector of starting volumes. Units of `x` specified in `from` argument
-#' @param from Units for `x`. Options: `"l"` (or `"liters"`), `"gallons"`, `"quarts"`, `"pints"`, `"cups"`, `"floz"` (fluid ounces), `"tablespoons"`, `"teaspoons"`. Enter as length 1 character vector. All units are case insensitive
-#' @param to Desired output units. Same options as `from`. Enter as length 1 character vector
-#' @returns Numeric vector expressed in units determined by `to` argument
-#' @noRd
-.convert_volume <- function(x, from, to) {
-  from <- tolower(from)
-  to <- tolower(to)
-  units <- c("l", "liters", "gallons", "quarts", "pints", "cups", "floz", "tablespoons", "teaspoons")
-  from <- match.arg(from, choices = units)
-  to <- match.arg(to, choices = units)
-  # Convert to L
-  z <- c(1000, 1000, 4546.09, 1136.523, 568.261, 240, 28.413, 15, 5)/1000
-  names(z) <- units
-  z <- x/z[from]*z[to]
-  names(z) <- NULL
-  z
-}
-
-#' Squish a numeric vector into a specified range
-#'
-#' Rewritten version of `scales::squish`
-#' @param x Numeric vector
-#' @param min,max Desired minimum and maximum values. Values in `x` below `min` will be set to `min`. Values in `x` above `max` will be set to `max`. If `NULL` (default for both), values outside the limit will not be changed
-#' @returns Numeric vector with same length as input
-#' @export
-squish <- function(x, min = NULL, max = NULL) {
-  if (!is.null(min)) {
-    x[x < min] <- min
-  }
-  if (!is.null(max)) {
-    x[x > max] <- max
-  }
-  x
 }
 
 #' log10 that leaves 0 unchanged

@@ -23,8 +23,6 @@ rename_by_fn <- function(.x, .fn = function(x) tolower(clean_names(x)), ...) {
   .x
 }
 
-# Modify values -----------------------------------------------------------
-
 # Rowwise -----------------------------------------------------------------
 
 #' Row-wise transformation
@@ -87,41 +85,6 @@ add_group_id <- function(.df, ..., .arrange_by = NULL, .new_colname = "n") {
   }
   .df <- dplyr::mutate(.df, "{.new_colname}" := seq_len(dplyr::n()))
   dplyr::ungroup(.df)
-}
-
-#' Add new categorical variable to data frame by pasting values from existing columns together
-#'
-#' @param df Data frame
-#' @param ... Comma separated list of quoted column names or a character vector of column names to combine
-#' @param add_colname_prefix If `TRUE` (default), values in each column are prefixed by column names
-#' @param sep_colname_value Symbol used to separate column name and corresponding values. Default is `" = "`. Only relevant when `add_colname_prefix = TRUE`
-#' @param sep_cols Symbol used to separate columns. Default is `", "`
-#' @param new_colname Column name for new variable. Default is `"group"`
-#' @param as_factor If `TRUE`, new variable converted to a factor
-#' @returns Data frame with new categorical variable containing combination of values in columns defined in `...`
-#' @export
-combine_vars <- function(
-    df,
-    ...,
-    add_colname_prefix = TRUE,
-    sep_colname_value = " = ",
-    sep_cols = ", ",
-    new_colname = "group",
-    as_factor = FALSE) {
-  vars <- c(...)
-  df_cols <- df[vars]
-  if (add_colname_prefix) {
-    for (i in names(df_cols)) {
-      df_cols[[i]] <- sprintf("%s%s%s", i, sep_colname_value, .subset2(df_cols, i))
-    }
-  }
-  z <- do.call(paste, c(df_cols, sep = sep_cols))
-  name <- .safe_name(.new = new_colname, .old = names(df), .sep = "")
-  if (new_colname != name) {
-    Warning(sprintf("In 'combine_vars', new_colname = '%s' but this column already exists in df.\n\nSetting new column name to '%s'", new_colname, name))
-  }
-  df[[name]] <- if (as_factor) factor(z, create_levels(z)) else z
-  df
 }
 
 #' Add new factor variable to data frame by pasting values from existing columns together

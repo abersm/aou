@@ -3,14 +3,11 @@
 \name{any_dupes}
 \alias{any_dupes}
 \alias{all_unique}
-\alias{is_id_var}
 \title{Determine whether vector contains any duplicate values}
 \usage{
 any_dupes(x, na.rm = TRUE)
 
 all_unique(x, na.rm = TRUE)
-
-is_id_var(x, na.rm = TRUE)
 }
 \arguments{
 \item{x}{Vector}
@@ -24,6 +21,4 @@ Length 1 logical vector
 Determine whether vector contains any duplicate values
 
 Determine whether all values in a vector are unique
-
-Alias for \code{all_unique}
 }

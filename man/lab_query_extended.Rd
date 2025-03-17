@@ -2,7 +2,7 @@
 % Please edit documentation in R/aou_sql_queries.R
 \name{lab_query_extended}
 \alias{lab_query_extended}
-\title{Lab query with extended columns}
+\title{Lab query with additional columns}
 \usage{
 lab_query_extended(
   x,
@@ -14,12 +14,12 @@ lab_query_extended(
 )
 }
 \arguments{
-\item{x}{Character vector or string containing the labs to query}
+\item{x}{Character vector of lab names}
 
-\item{ext_cols}{Extra columns to return on top of the date and value of the lab}
+\item{ext_cols}{Extra columns (aside from date and lab value) to include in output}
 }
 \value{
-data.table containing the following columns: person_id, measurement_date, value_as_number, ext_cols
+Data frame with columns: person_id, measurement_date, value_as_number, ext_cols
 }
 \description{
 Example: lab_query(c("Triglyceride \link{Mass/volume} in Serum or Plasma","Triglyceride \link{Mass/volume} in Blood"), ext_cols = c("unit_source_value"))

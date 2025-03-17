@@ -7,37 +7,25 @@
 #' @param ... Arguments passed to `dplyr::left_join()`
 #' @returns Merged data frame with message containing number of rows in `df1` and output data frame
 #' @export
-left_join_safe <- function(df1, df2, by = NULL, ...) {
+lj <- function(df1, df2, by = NULL, ...) {
   .safe_join(.df1 = df1, .df2 = df2, .by = by, .type = "left", ...)
 }
 
-#' Alias for left_join_safe
-#'
-#' @rdname left_join_safe
-#' @export
-lj <- left_join_safe
-
 #' Right join with information about number of rows before and after join
 #'
-#' @rdname left_join_safe
+#' @rdname lj
 #' @param df1,df2 Primary and secondary data frames
 #' @param by Key variables shared between `df1` and `df2`
 #' @param ... Arguments passed to `dplyr::right_join()`
 #' @returns Merged data frame with message containing number of rows in `df2` and output data frame
 #' @export
-right_join_safe <- function(df1, df2, by = NULL, ...) {
+rj <- function(df1, df2, by = NULL, ...) {
   .safe_join(.df1 = df1, .df2 = df2, .by = by, .type = "right", ...)
 }
 
-#' Alias for right_join_safe
-#'
-#' @rdname right_join_safe
-#' @export
-rj <- right_join_safe
-
 #' Semi join with information about number of rows before and after join
 #'
-#' @rdname left_join_safe
+#' @rdname lj
 #' @param df1,df2 Primary and secondary data frames
 #' @param by Key variables shared between `df1` and `df2`
 #' @param ... Arguments passed to `dplyr::semi_join()`
@@ -49,7 +37,7 @@ semi_join_safe <- function(df1, df2, by = NULL, ...) {
 
 #' Inner join with information about number of rows before and after join
 #'
-#' @rdname left_join_safe
+#' @rdname lj
 #' @param df1,df2 Primary and secondary data frames
 #' @param by Key variables shared between `df1` and `df2`
 #' @param ... Arguments passed to `dplyr::inner_join()`
@@ -61,7 +49,7 @@ inner_join_safe <- function(df1, df2, by = NULL, ...) {
 
 #' Anti join with information about number of rows before and after join
 #'
-#' @rdname left_join_safe
+#' @rdname lj
 #' @param df1,df2 Primary and secondary data frames
 #' @param by Key variables shared between `df1` and `df2`
 #' @param ... Arguments passed to `dplyr::anti_join()`

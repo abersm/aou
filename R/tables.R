@@ -6,14 +6,6 @@
 #' @param ... Variables to create table. Enter as character vector, comma separated list of unquoted or unquoted column names, or formula
 #' @param incl_na If `FALSE` (default), NA values are not included in table. If `TRUE`, NA is included in table
 #' @returns Table
-#'
-#' @examples
-#' \dontrun{
-#' # covid |> xtab(death, gender)
-#' # covid |> x_table(death, gender) # Output same as above
-#' # table(covid$death, covid$gender) # Output same as above but names(dimnames(x)) is NULL
-#' }
-#'
 #' @export
 xtab <- function(df, ..., incl_na = FALSE) {
   dots <- dots_as_quoted(...)
@@ -59,14 +51,6 @@ xtab <- function(df, ..., incl_na = FALSE) {
 #' @param title_row_totals Title of column containing row totals. Default is `"Total"`
 #' @param title_col_totals Title of row containing column totals. Default is `"Total"`
 #' @returns Cross table +/- rows and columns for totals
-#'
-#' @examples
-#' \dontrun{
-#' # covid |> x_table(death, gender)
-#' # covid |> xtab(death, gender) # Output same as above
-#' # table(covid$death, covid$gender) # Output same as above but names(dimnames(x)) is NULL
-#' }
-#'
 #' @export
 x_table <- function(df, ..., total = FALSE, incl_na = TRUE, title_row_totals = "Total", title_col_totals = "Total") {
   vars <- names(dplyr::select(df, ...))
@@ -84,12 +68,6 @@ x_table <- function(df, ..., total = FALSE, incl_na = TRUE, title_row_totals = "
 #' @param title_row_totals Title of column containing row totals. Default is `"Total"`
 #' @param title_col_totals Title of row containing column totals. Default is `"Total"`
 #' @returns Matrix containing row and column sums as well as raw numbers in `x`. Number in bottom right hand corner of matrix contains overall total
-#'
-#' @examples
-#' \dontrun{
-#' # table(covid$death, covid$gender) |> add_totals()
-#' }
-#'
 #' @export
 add_totals <- function(x, title_row_totals = "Total", title_col_totals = "Total") {
   dims <- dim(x)
@@ -117,13 +95,6 @@ add_totals <- function(x, title_row_totals = "Total", title_col_totals = "Total"
 #' @param ... If `x` is a data frame, enter column names using tidyselect syntax
 #' @param incl_na If `x` is a data frame, `incl_na` determines whether missing values form distinct groups
 #' @returns Table containing column proportions (i.e., column proportions sum to 1)
-#'
-#' @examples
-#' \dontrun{
-#' # table(covid$death, covid$gender) |> col_prop() |> colSums() # Output: c(1, 1)
-#' # covid |> col_prop(death, gender) |> colSums() # Output same as above
-#' }
-#'
 #' @export
 col_prop <- function(x, ..., incl_na = FALSE) {
   x <- if (is.data.frame(x)) {
@@ -141,13 +112,6 @@ col_prop <- function(x, ..., incl_na = FALSE) {
 #' @param ... If `x` is a data frame, enter column names using tidyselect syntax
 #' @param incl_na If `TRUE` (default), missing values are included in output
 #' @returns Table containing row proportions (i.e., row proportions sum to 1)
-#'
-#' @examples
-#' \dontrun{
-#' # table(covid$death, covid$gender) |> row_prop() |> rowSums() # Output: c(1, 1)
-#' # covid |> row_prop(death, gender) |> rowSums() # Output same as above
-#' }
-#'
 #' @export
 row_prop <- function(x, ..., incl_na = FALSE) {
   x <- if (is.data.frame(x)) {
@@ -166,13 +130,6 @@ row_prop <- function(x, ..., incl_na = FALSE) {
 #' @param incl_na If `x` is a data frame, `incl_na` determines whether missing values form distinct groups
 #' @param digits Number of digits to include after decimal. Default is `1`
 #' @returns Table containing column percentages (i.e., column percentages sum to 100)
-#'
-#' @examples
-#' \dontrun{
-#' # table(covid$death, covid$gender) |> col_perc() |> colSums() # Output: c(100, 100)
-#' # covid |> col_perc(death, gender) |> colSums() # Output same as above
-#' }
-#'
 #' @export
 col_perc <- function(x, ..., incl_na = FALSE, digits = 1) {
   x <- col_prop(x, ..., incl_na = incl_na)
@@ -187,13 +144,6 @@ col_perc <- function(x, ..., incl_na = FALSE, digits = 1) {
 #' @param incl_na If `x` is a data frame, `incl_na` determines whether missing values form distinct groups
 #' @param digits Number of digits to include after decimal. Default is `1`
 #' @returns Table containing row percentages (i.e., row percentages sum to 100)
-#'
-#' @examples
-#' \dontrun{
-#' # table(covid$death, covid$gender) |> row_perc() |> rowSums() # Output: c(100, 100)
-#' # covid |> row_perc(death, gender) |> rowSums() # Output same as above
-#' }
-#'
 #' @export
 row_perc <- function(x, ..., incl_na = FALSE, digits = 1) {
   x <- row_prop(x, ..., incl_na = incl_na)
@@ -348,7 +298,7 @@ tab_2_by_2.data.frame <- function(x, ...) {
     }
   } else {
     # x is not a data frame of counts. Determine which columns were selected in dots
-    dots_class <- vapply(dots_as_unquoted(...), class, character(1), USE.NAMES = FALSE)
+    dots_class <- vapply(eval(substitute(alist(...)), envir = parent.frame()), class, character(1), USE.NAMES = FALSE)
     vars <- if (dots_class[1L] == "call") all.vars(...) else names(dplyr::select(x, ...))
     n_vars <- length(vars)
     if (n_vars == 2L) {

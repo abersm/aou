@@ -52,16 +52,10 @@ vars_chr <- function(df, invert = FALSE) vars_which(df, .predicate_fn = is.chara
 #' @rdname vars_which
 #' @param incl_integer If `TRUE` (default), integer variables are included
 #' @export
-vars_dbl <- function(df, invert = FALSE, incl_integer = TRUE) {
+vars_numeric <- function(df, invert = FALSE, incl_integer = TRUE) {
   predicate <- if (incl_integer) is.numeric else is_continuous
   vars_which(df, .predicate_fn = predicate, .invert = invert)
 }
-
-#' Alias for vars_dbl
-#'
-#' @rdname vars_which
-#' @export
-vars_numeric <- vars_dbl
 
 #' Get names of continuous variables
 #'

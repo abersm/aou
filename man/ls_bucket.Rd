@@ -4,7 +4,7 @@
 \alias{ls_bucket}
 \title{List contents of bucket}
 \usage{
-ls_bucket(...)
+ls_bucket(..., bucket = Sys.getenv("WORKSPACE_BUCKET"))
 }
 \description{
 List contents of bucket

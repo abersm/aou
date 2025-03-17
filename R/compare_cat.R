@@ -8,11 +8,6 @@
 #' @param max_n_unique Maximum number of factor levels for a non-grouping variable to be included in output. Enter as length 1 integer. Default is `20`
 #' @param as_df If `TRUE` (default), output will be a data frame. If `FALSE`, output will be a list of tables
 #' @returns Data frame (if `as_df = TRUE`) or list of tables (if `as_df = FALSE`)
-#'
-#' @examples
-#' # compare_cat(covid, gender)
-#' # compare_cat(covid, gender, split_by = "icu")
-#'
 #' @export
 compare_cat <- function(
     df,

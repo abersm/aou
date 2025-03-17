@@ -41,7 +41,7 @@ is_date <- function(x) inherits(x, c("Date", "POSIXct"))
 #' @export
 as_date <- function(x) {
   if (is_date(x)) return(as.Date(x))
-  x <- str_trimws(x)
+  x <- trimws(x)
   x <- strsplit(x, "\\/|-")
   x <- vapply(x, function(y) {
     if (length(y) != 3L) return(NA_character_)

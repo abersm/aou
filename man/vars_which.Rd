@@ -7,7 +7,6 @@
 \alias{vars_cat}
 \alias{vars_fct}
 \alias{vars_chr}
-\alias{vars_dbl}
 \alias{vars_numeric}
 \alias{vars_continuous}
 \alias{vars_int}
@@ -33,8 +32,6 @@ vars_cat(df, max_n_unique = 10, invert = FALSE)
 vars_fct(df, invert = FALSE)
 
 vars_chr(df, invert = FALSE)
-
-vars_dbl(df, invert = FALSE, incl_integer = TRUE)
 
 vars_numeric(df, invert = FALSE, incl_integer = TRUE)
 
@@ -107,8 +104,6 @@ Get names of factor variables
 Get names of character variables
 
 Get names of numeric variables
-
-Alias for vars_dbl
 
 Get names of continuous variables
 

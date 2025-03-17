@@ -211,39 +211,6 @@ update_values.data.frame <- function(x, lookup, old = NULL, new = NULL, col = NU
   x
 }
 
-# Replace values ----------------------------------------------------------
-
-#' Replace values in character or factor vector using lookup
-#'
-#' Functionality from ggplot2
-#' @param x Character or factor vector
-#' @param ... Enter as named character vector or comma separated list of name/value pairs (values as strings). Names match elements in `x` that will be replaced. Values are replacements
-#' @returns Vector with same class as input
-#' @export
-replace_values <- function(x, ...) {
-  replacements <- c(...)
-  old <- names(replacements)
-  if (is.null(old)) {
-    Stop("In 'replace_values', input to '...' must be named")
-  }
-  if (is.character(x)) {
-    idx <- match(old, x, nomatch = 0L)
-    replacements <- replacements[idx > 0L]
-    if (length(replacements) == 0L) return(x)
-    x[idx] <- replacements
-  } else if (is.factor(x)) {
-    x_levels <- attr(x, "levels")
-    idx <- match(old, x_levels, nomatch = 0L)
-    replacements <- replacements[idx]
-    if (length(replacements) == 0L) return(x)
-    x_levels[idx] <- replacements
-    attr(x, "levels") <- x_levels
-  } else {
-    .stop_input_class(x)
-  }
-  x
-}
-
 # Helpers -----------------------------------------------------------------
 
 #' Process lookup, new, old arguments of a lookup functions

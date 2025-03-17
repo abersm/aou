@@ -41,17 +41,6 @@ vec_to_df <- function(..., .col_names = NULL, .prefix = "V", .row_names = NULL) 
 #' Opposite of `as.list.data.frame`
 #' @param x List of vectors. Each vector must have same length or must share a common multiple (see examples for details). To convert a list of vectors to rows of a data frame, use `rbind_list()`
 #' @returns Data frame with elements of input list (vectors) forming columns of output data frame
-#'
-#' @examples
-#' \dontrun{
-#' ## Identical to data.frame(a = 1:3, b = 4:6)
-#' # cbind_list(list(a = 1:3, b = 4:6))
-#' ## Identical to data.frame(a = 1:3, b = 4:9)
-#' # cbind_list(list(a = 1:3, b = 4:9))
-#' ## Results in error: same as data.frame(a = 1:3, b = 4:8)
-#' # cbind_list(list(a = 1:3, b = 4:8))
-#' }
-#'
 #' @export
 cbind_list <- function(x) {
   x <- remove_null(x)
@@ -78,13 +67,6 @@ cbind_list <- function(x) {
 #' @param colname_rownames Name of column in output data frame containing rownames of `x`. Only relevant when `rownames_to_col = TRUE`. Default is `"rowname"`
 #' @param prefix Prefix for newly created column names. Default is `"V"`
 #' @returns Data frame with elements of input combined to form rows of data frame
-#'
-#' @examples
-#' \dontrun{
-#' # rbind_list(list(a = 1:5, b = 6:10)) # Data frame with 2 rows and 5 columns
-#' # rbind_list(list(a = 1, b = 6:10)) # Data frame with 2 rows (1st row contains all 1)
-#' }
-#'
 #' @export
 rbind_list <- function(..., rownames_to_col = FALSE, colname_rownames = "rowname", prefix = "V") {
   x <- if (is.list(x <- c(...))) x else list(...)
@@ -98,12 +80,6 @@ rbind_list <- function(..., rownames_to_col = FALSE, colname_rownames = "rowname
 #' @param colname_rownames Name of column in output data frame containing rownames of `x`. Only relevant when `rownames_to_col = TRUE`. Default is `"rowname"`
 #' @param prefix Prefix for newly created column names. Default is `"V"`
 #' @returns Data frame
-#'
-#' @examples
-#' \dontrun{
-#' # matrix_to_df(matrix(1:20, nrow = 2))
-#' }
-#'
 #' @export
 matrix_to_df <- function(x, rownames_to_col = FALSE, colname_rownames = "rowname", prefix = "V") {
   # Dimensions of input matrix
@@ -128,10 +104,6 @@ matrix_to_df <- function(x, rownames_to_col = FALSE, colname_rownames = "rowname
 
   # Split matrix into list of columns
   df <- lapply(col_idx, function(i) x[, i])
-  #df <- vector("list", n_cols)
-  #for (i in col_idx) {
-  #  df[[i]] <- x[, i]
-  #}
   # Convert list of columns to data frame
   class(df) <- "data.frame"
   attr(df, "row.names") <- c(NA_integer_, -n_rows)
@@ -144,46 +116,12 @@ matrix_to_df <- function(x, rownames_to_col = FALSE, colname_rownames = "rowname
   }
 }
 
-#' Convert components of matrix to data frame
-#'
-#' Code from stackoverflow.com/questions/18127476/extract-one-triangle-of-a-correlation-matrix-with-attributes
-#' Primary use is to convert pairwise matrix to a data frame containing columns for row name, column name, and value
-#' @param x Matrix. Must have row names and column names
-#' @param upper,lower,diag Component of matrix to include in output. Enter each as a length 1 logical
-#' @returns Data frame with columns "row", "col", "value"
-#' @noRd
-.matrix_component_to_df <- function(x, upper = TRUE, lower = FALSE, diag = FALSE) {
-  z <- dimnames(x)
-  idx <- if (upper) {
-    upper.tri(x, diag = diag)
-  } else if (lower) {
-    lower.tri(x, diag = diag)
-  } else if (diag) {
-    dims <- dim(x)
-    idx_diag <- 1L + seq.int(from = 0L, to = min(dims) - 1L)*(dims[1L] + 1L)
-    idx <- matrix(NA, nrow = dims[1L], ncol = dims[2L])
-    idx[idx_diag] <- TRUE
-    idx
-  } else {
-    if (!diag) return(empty_df())
-    dims <- dim(x)
-    matrix(TRUE, nrow = dims[1L], ncol = dims[2L])
-  }
-  idx <- which(idx, arr.ind = TRUE)
-  vec_to_df(
-    row = z[[1L]][idx[, 1L]],
-    col = z[[2L]][idx[, 2L]],
-    value = x[idx]
-  )
-}
-
-
 #' Convert named vector to data frame with 2 columns (1 column for values, 1 column for named)
 #'
 #' @param x Named vector
 #' @param colname_names,colname_values Column names for names and values, respectively. Enter as length 1 character vector
 #' @returns Data frame with 2 columns
-#' @export
+#' @noRd
 named_vector_to_df <- function(x, colname_names = "names", colname_values = "values") {
   vec_to_df(names = names(x), values = unname(x), .col_names = c(colname_names, colname_values))
 }
@@ -197,12 +135,6 @@ named_vector_to_df <- function(x, colname_names = "names", colname_values = "val
 #' @param rownames Row names for output matrix. Enter as character vector with length equal to `nrow(df)`. If specified, `col_to_rownames` must be `NULL`
 #' @param col_to_rownames Column in `df` containing row names for output matrix. Note: column containing row names will not be included in output matrix. Enter as length 1 character (column name) or integer (column number) vector. If specified, `rownames` must not be specified
 #' @returns Matrix. If `col_to_rownames = NULL`, dimensions of output matrix will be identical to dimensions of `df`. If `col_to_rownames` is specified, output matrix will have `nrow(df)` rows and `ncol(df) - 1L` columns
-#'
-#' @examples
-#' \dontrun{
-#' # df_to_matrix(mtcars)
-#' }
-#'
 #' @export
 df_to_matrix <- function(df, rownames = NULL, col_to_rownames = NULL) {
   if (!is.null(col_to_rownames)) {

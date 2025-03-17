@@ -19,9 +19,3 @@ Matrix containing row and column sums as well as raw numbers in \code{x}. Number
 \description{
 Add column and row totals to table or matrix
 }
-\examples{
-\dontrun{
-# table(covid$death, covid$gender) |> add_totals()
-}
-
-}

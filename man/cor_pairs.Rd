@@ -21,8 +21,3 @@ Data frame with columns "col_1", "col_2", "cor", "cor_lower", "cor_upper", "p", 
 \description{
 Calculate correlation coefficient and P value for each pair of columns in data frame
 }
-\examples{
-# cor_pairs(covid)
-# cor_pairs(dplyr::group_by(covid, severity))
-
-}

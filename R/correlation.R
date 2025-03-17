@@ -5,11 +5,6 @@
 #' @param method Method of comparison. Options: `"spearman"` (default), `"pearson"`, `"kendall"`
 #' @param ci Confidence interval. Enter as length 1 numeric 0-1. Default is `0.95`
 #' @returns Data frame with columns "col_1", "col_2", "cor", "cor_lower", "cor_upper", "p", "label", "method", "n", "n_nna", "perc_na"
-#'
-#' @examples
-#' # cor_pairs(covid)
-#' # cor_pairs(dplyr::group_by(covid, severity))
-#'
 #' @export
 cor_pairs <- function(df, ..., method = c("spearman", "pearson", "kendall"), ci = 0.95) {
   method <- match.arg(arg = method, choices = c("spearman", "pearson", "kendall"))

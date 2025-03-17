@@ -32,7 +32,18 @@
   dest <- paste0(output_folder, gsub(".csv", "_*.csv", dest))
   bq_table <- bigrquery::bq_dataset_query(Sys.getenv("WORKSPACE_CDR"), query, billing = Sys.getenv("GOOGLE_PROJECT"))
   bigrquery::bq_table_save(bq_table, dest, destination_format = "CSV")
-  res <- data.table::as.data.table(aou.bucket::read_bucket(dest))
+  col_types <- NULL
+  bucket_provided <- grepl("^gs://", dest)
+  if (!bucket_provided) {
+    bucket <- Sys.getenv("WORKSPACE_BUCKET")
+    dest <- stringr::str_glue("{bucket}/{dest}")
+  }
+  files <- system2("gcloud", args = c("storage ls", dest), stdout = TRUE, stderr = TRUE)
+  f <- basename(files)
+  system(paste0(c("gcloud storage cp ", files, "."), collapse = " "), intern = T)
+  dat_list <- lapply(f, data.table::fread)
+  lapply(f, dest.remove)
+  res <- data.table::rbindlist(dat_list)
   if (rm_csv) {
     system(stringr::str_glue("gsutil rm {output_folder}*"), intern = TRUE)
   }
@@ -66,7 +77,7 @@ concept_code_query <- function(x, anchor_date_table = NULL, before = NULL, after
 
 #' Condition query
 #'
-#' Example: condition_query(concept_ids = c(710706,705076), source_values = "U09.9")
+#' Example: condition_query(concept_ids = c(710706, 705076), source_values = "U09.9")
 #' @param concept_ids Numeric vector with condition concept ids
 #' @param source_values Character vector with condition source values
 #' @rdname concept_code_query
@@ -127,7 +138,7 @@ demographics_query <- function(dest = "demographics_query_result.csv",  anchor_d
 
 #' Lab concept query
 #'
-#' Example: lab_concept_query(c(586520,586523,586525))
+#' Example: lab_concept_query(c(586520, 586523, 586525))
 #' @param x Character vector of lab concept codes
 #' @returns Data frame with columns: person_id, measurement_date, value_as_number, value_as_concept
 #' @rdname concept_code_query
@@ -409,7 +420,7 @@ icd10_query <- function(x = NULL, anchor_date_table = NULL, before = NULL, after
 
 #' SNOMED condition query
 #'
-#' @param x Character vector of SNOMED condition codes. May contain wildcards using % (e.g. "410.%")
+#' @param x Character vector of SNOMED condition codes
 #' @returns Data frame with columns: person_id, condition_start_date, condition_source_value
 #' @rdname concept_code_query
 #' @export
@@ -444,5 +455,5 @@ snomed_query <- function(x = NULL, anchor_date_table = NULL, before = NULL, afte
   }
   result_all <- .download_big_data(query,dest)
   result_all$condition_source_value <- as.character(result_all$condition_source_value)
-  result_all <- .window_data(result_all,"condition_start_date",anchor_date_table,before,after)
+  .window_data(result_all, "condition_start_date", anchor_date_table, before, after)
 }

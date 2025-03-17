@@ -265,7 +265,7 @@ glm_tidy <- function(x, ci = 0.95) {
 #' @param mult_sign String used to indicate multiplication in output. Default is `"×"`
 #' @param subtract_sign String used to indicate multiplication in output. Default is `"–"`
 #' @returns Length 1 character vector
-#' @export
+#' @noRd
 lm_reg_line_equation <- function(
     x,
     digits = 2,

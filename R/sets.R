@@ -17,27 +17,24 @@ interleave <- function(..., coerce_fn = as.character) {
 #'
 #' Similar to `base::setdiff` but doesn't convert `x` and `y` to vectors
 #' @param x,y Vectors
-#' @export
+#' @noRd
 Setdiff <- function(x, y) unique(x[match(x, y, nomatch = 0L) == 0L])
 
 #' Elements in x and y
 #'
 #' Similar to `base::intersect` but doesn't convert `x` and `y` to vectors
-#' @rdname Setdiff
-#' @export
+#' @noRd
 Intersect <- function(x, y) unique(y[match(x, y, nomatch = 0L)])
 
 #' Determine whether all elements of x are also present in y and vice versa (independent of order)
 #'
 #' Similar to `base::setequal` but doesn't convert `x` and `y` to vectors
-#' @rdname Setdiff
-#' @export
+#' @noRd
 Setequal <- function(x, y) !(anyNA(match(x, y)) || anyNA(match(y, x)))
 
 #' Setequal on > 2 vectors
 #'
 #' Equivalent to sequentially running `Setequal` on > 2 vectors
-#' @rdname Setdiff
 #' @param ... Either a comma separated list of vectors not wrapped in `c()` or a list containing vectors
 #' @returns Length 1 logical vector
 #' @export
@@ -49,7 +46,7 @@ Setequal_all <- function(...) {
 #' Setdiff on > 2 vectors
 #'
 #' Equivalent to sequentially running `Setdiff` on > 2 vectors
-#' @rdname Setdiff
+#' @rdname Setequal_all
 #' @param ... Either a comma separated list of vectors not wrapped in `c()` or a list containing vectors
 #' @export
 Setdiff_all <- function(...) {
@@ -60,7 +57,7 @@ Setdiff_all <- function(...) {
 #' Extract values that are unique to a single entry
 #'
 #' Equivalent to combining the results from running `Setdiff` and running `Setdiff` with input order reversed
-#' @rdname Setdiff
+#' @rdname Setequal_all
 #' @param ... Either a comma separated list of vectors not wrapped in `c()` or a list containing vectors
 #' @export
 Setdiff_any <- function(...) {
@@ -71,7 +68,7 @@ Setdiff_any <- function(...) {
 #' Elements common to all input vectors
 #'
 #' Equivalent to sequentially running `Intersect` on > 2 vectors
-#' @rdname Setdiff
+#' @rdname Setequal_all
 #' @param ... Vectors or list of vectors
 #' @export
 Intersect_all <- function(...) {

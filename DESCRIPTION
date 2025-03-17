@@ -16,8 +16,7 @@ Imports:
     purrr,
     rlang,
     scales,
-    survival,
-    tidyverse
+    survival
 Suggests: 
     brolgar,
     cli,

@@ -392,7 +392,7 @@ rr_ci <- rel_risk
 #' @returns List containing rr, rr_lower, rr_upper. Used by `rel_risk`
 #' @noRd
 .relative_risk_ci <- function(x, ci = 0.95) {
-  if (anyNA(x) || any_zero(x)) {
+  if (anyNA(x) || any(x == 0, na.rm = TRUE)) {
     return(list(rr = NA_real_, rr_lower = NA_real_, rr_upper = NA_real_))
   }
   case_outcome <- x[2L, 2L]

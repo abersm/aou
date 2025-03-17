@@ -14,40 +14,7 @@ Select <- function(.df, ...) if (n_dots(...) == 0L) .df else dplyr::select(.df, 
 #' @rdname Select
 #' @export
 remove_constant_cols <- function(df) {
-  df[!vapply(df, function(x) allNA(x) | is_constant(x), logical(1), USE.NAMES = TRUE)]
-}
-
-# Subset columns and rows -------------------------------------------------
-
-#' Alternative version of `base::subset`
-#'
-#' Similar to using `dplyr::select` followed by `dplyr::filter`
-#' @param df Data frame
-#' @param cols Columns to select. Enter as quoted or unquoted column names or column numbers. For any input type, use `c()` if multiple columns are selected. Use `-` to exclude columns. Default selects all columns
-#' @param rows Rows to select. Enter as predicate statement or row numbers. Not compatible with tidyselect input. Default uses all rows
-#' @returns Data frame with columns specified by cols argument and rows specified by rows input
-#' @export
-Subset <- function(df, cols, rows) {
-  include_rows <- if (missing(rows)) {
-    TRUE
-  } else if (!is.numeric(rows)) {
-    rows_predicate <- substitute(rows)
-    include_rows <- eval(rows_predicate, df, parent.frame())
-    if (!is.logical(include_rows)) {
-      Stop("In 'Subset', 'rows' argument must evaluate to a length 1 logical vector")
-    }
-    include_rows & !is.na(include_rows)
-  } else {
-    rows
-  }
-  include_vars <- if (missing(cols)) {
-    TRUE
-  } else {
-    df_cols <- as.list(seq_along(df))
-    names(df_cols) <- names(df)
-    eval(substitute(cols), df_cols, parent.frame())
-  }
-  df[include_rows, include_vars, drop = FALSE]
+  df[!vapply(df, function(x) all(is.na(x)) | is_constant(x), logical(1), USE.NAMES = TRUE)]
 }
 
 # Subset rows -------------------------------------------------------------

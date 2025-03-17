@@ -26,10 +26,3 @@ Data frame with elements of input combined to form rows of data frame
 \description{
 Similar to \code{Reduce(rbind, list)}
 }
-\examples{
-\dontrun{
-# rbind_list(list(a = 1:5, b = 6:10)) # Data frame with 2 rows and 5 columns
-# rbind_list(list(a = 1, b = 6:10)) # Data frame with 2 rows (1st row contains all 1)
-}
-
-}

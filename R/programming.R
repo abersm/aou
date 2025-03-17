@@ -4,7 +4,7 @@
 #'
 #' @param .input Input. Can be piped
 #' @returns If `.input` is `NULL` or can be evaluated to a vector, output is same as input. Otherwise, output is a character representing the typed input. Objects in global environment are ignored
-#' @export
+#' @noRd
 get_input <- function(.input) {
   input <- tryCatch(suppressWarnings(force(.input)), error = function(e) "try-error")
   if (is.null(input)) return(NULL)
@@ -41,22 +41,11 @@ get_input_dots <- function(...) {
 #' @param ... Comma separated list of quoted or unquoted terms
 #' @param .use_names If `TRUE`, output includes any names entered in `...`
 #' @returns Character vector (terms entered in dots are not evaluated or interpreted)
-#' @export
+#' @noRd
 dots_as_quoted <- function(..., .use_names = FALSE) {
   unlist(lapply(eval(substitute(alist(...))), function(x) {
     gsub("\"", "", deparse(x, width.cutoff = 500L))
   }), use.names = .use_names)
-}
-
-#' Collect dots as unquoted terms
-#'
-#' @rdname dots_as_quoted
-#' @returns List of unquoted terms. Input to `...` is not evaluated or interpreted
-#' @export
-dots_as_unquoted <- function(..., .use_names = FALSE) {
-  # Alternative 1: eval(substitute(alist(...)), envir = parent.frame())
-  # Alternative 2: as.list(substitute(list(...)))[-1L]
-  unlist(rlang::eval_bare(substitute(alist(...))), use.names = .use_names)
 }
 
 #' Determine number of terms entered as dots

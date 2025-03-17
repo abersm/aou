@@ -132,7 +132,7 @@ r.numeric <- function(x, n_bins = 20, color = "#328EC3", show_plot = TRUE, x_axi
     paste0("n (non-missing) = ", n_nna),
     paste0("n (missing) = ", n_na),
     paste0("Mean ", "\u00B1", " SD = ", gsub("e", paste0("\u00D7", "10^"), format_number(x_mean, digits = 1)), " ", "\u00B1", " ", gsub("e", paste0("\u00D7", "10^"), format_number(SD(x), digits = 1))),
-    paste0("Median [IQR] = ", gsub("e", paste0("\u00D7", "10^"), format_num_range(x_median, Q1(x), Q3(x), sep = " - ", digits = 1, bracket_type = "["))),
+    paste0("Median [IQR] = ", gsub("e", paste0("\u00D7", "10^"), format_num_range(x_median, Quantile(x, 0.25), Quantile(x, 0.75), sep = " - ", digits = 1, bracket_type = "["))),
     paste0("Min = ", gsub("e", paste0("\u00D7", "10^"), format_number(rng[1], digits = 1))),
     paste0("Max = ", gsub("e", paste0("\u00D7", "10^"), format_number(rng[2], digits = 1))),
     paste0("P Shapiro test = ", format_p_value(p_shapiro(x))),

@@ -11,11 +11,6 @@
 #' @param paired If `FALSE` (default), unpaired test performed. If `TRUE`, paired test performed
 #' @param vars_remove Variables to remove from output. Enter as comma separated list of quoted variable names wrapped in `c()`
 #' @returns Data frame
-#'
-#' @examples
-#' # compare_means(covid, wbc ~ death, gender)
-#' # compare_means(covid, wbc ~ death, "gender")
-#'
 #' @export
 compare_means <- function(
     df,

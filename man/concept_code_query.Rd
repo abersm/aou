@@ -14,7 +14,7 @@
 \alias{wgs_query}
 \alias{icd10_query}
 \alias{snomed_query}
-\title{Concept code query}
+\title{Condition concept code query}
 \usage{
 concept_code_query(
   x,
@@ -113,9 +113,9 @@ snomed_query(
 )
 }
 \arguments{
-\item{x}{Character vector or character string containing snomed codes. String can contain wildcards using \% (e.g. "410.\%")}
+\item{x}{Character vector of SNOMED condition codes}
 
-\item{anchor_date_table}{Data frame with 2 columns: person_id, anchor_date. A time window can be defined around the anchor date using the \code{before} and \code{after} arguments}
+\item{anchor_date_table}{Data frame with 2 columns: person_id, anchor_date. Time window can be defined around anchor_date using \code{before} and \code{after}}
 
 \item{before}{integer >= 0. Dates prior to anchor_date + before will be excluded}
 
@@ -126,38 +126,38 @@ snomed_query(
 \item{source_values}{Character vector with condition source values}
 }
 \value{
-data.table containing the following columns: person_id, condition_start_date, concept_name, condition_concept_id
+Data frame with columns: person_id, condition_start_date, concept_name, condition_concept_id
 
-data.table containing the following columns: person_id, condition_start_date, condition_concep_id, condition_source_value
+Data table with columns: person_id, condition_start_date, condition_concep_id, condition_source_value
 
-data.table with the following columns: person_id, date_of_birth, race, ethnicity, sex
+Data frame with columns: person_id, date_of_birth, race, ethnicity, sex
 
-data.table containing the following columns: person_id, measurement_date, value_as_number, value_as_concept
+Data frame with columns: person_id, measurement_date, value_as_number, value_as_concept
 
-data.table containing the following columns: person_id, measurement_date, value_as_number
+Data frame with columns: person_id, measurement_date, value_as_number
 
-data.table containing the following columns: person_id, drug_exposure_start_date
+Data frame with columns: person_id, drug_exposure_start_date
 
-data.table containing the following columns: person_id, drug_exposure_start_date, record_source
+Data frame with columns: person_id, drug_exposure_start_date, record_source
 
-data.table with the following columns: person_id, measurement_date, bmi
+Data frame with the following columns: person_id, measurement_date, bmi
 
-data.table with the following columns: person_id, death_entry_date
+Data frame with the following columns: person_id, death_entry_date
 
-data.table with the following columns: person_id, survey_response, survey_date
+Data frame with the following columns: person_id, survey_response, survey_date
 
-data.table with the following columns: person_id
+Data frame with the following columns: person_id
 
-data.table with the following columns: person_id, condition_start_date, condition_source_value
+Data frame with columns: person_id, condition_start_date, condition_source_value
 
-data.table with the following columns: person_id, condition_start_date, condition_source_value
+Data frame with columns: person_id, condition_start_date, condition_source_value
 }
 \description{
 Example: concept_code_query(c(441641, 4014295))
 
-Example: condition_query(concept_ids = c(710706,705076), source_values = "U09.9")
+Example: condition_query(concept_ids = c(710706, 705076), source_values = "U09.9")
 
-Example: lab_concept_query(c(586520,586523,586525))
+Example: lab_concept_query(c(586520, 586523, 586525))
 
 Example: lab_query(c("Triglyceride \link{Mass/volume} in Serum or Plasma","Triglyceride \link{Mass/volume} in Blood"))
 

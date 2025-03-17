@@ -4,12 +4,12 @@
 \alias{top}
 \title{Display specified number of rows of data frame as tibble}
 \usage{
-top(df, n = 15)
+top(df, n = 100)
 }
 \arguments{
 \item{df}{Data frame}
 
-\item{n}{Number of rows to display. Default is \code{15}}
+\item{n}{Number of rows to display. Default is \code{100}}
 }
 \value{
 Print first \code{n} rows of \code{df}

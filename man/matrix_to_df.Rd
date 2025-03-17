@@ -26,9 +26,3 @@ Data frame
 \description{
 Convert a matrix to a data frame
 }
-\examples{
-\dontrun{
-# matrix_to_df(matrix(1:20, nrow = 2))
-}
-
-}

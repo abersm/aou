@@ -2,18 +2,9 @@
 % Please edit documentation in R/stats_descriptive.R
 \name{Quantile}
 \alias{Quantile}
-\alias{Q1}
-\alias{Q3}
-\alias{iqr}
 \title{Quantile}
 \usage{
 Quantile(x, probs = c(0, 0.25, 0.5, 0.75, 1), prism = FALSE)
-
-Q1(x)
-
-Q3(x)
-
-iqr(x)
 }
 \arguments{
 \item{x}{Numeric vector}
@@ -24,8 +15,6 @@ iqr(x)
 }
 \value{
 Numeric vector with length equal to the length of \code{probs}
-
-Length 2 numeric vector containing 25th and 75th percentile values
 }
 \description{
 Functionality from \code{stats::quantile}

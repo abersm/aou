@@ -35,8 +35,3 @@ Data frame (if \code{as_df = TRUE}) or list of tables (if \code{as_df = FALSE})
 \description{
 Compare categorical variable across 2 or more groups
 }
-\examples{
-# compare_cat(covid, gender)
-# compare_cat(covid, gender, split_by = "icu")
-
-}

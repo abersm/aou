@@ -73,18 +73,6 @@ load_df <- function(
   out
 }
 
-#' Move object from workspace to bucket
-#'
-#' @param x Object in global environment
-#' @param filename Name for exported Rdata file
-#' @returns Rdata file silently exported
-#' @export
-transfer_to_bucket <- function(x, filename = deparse(substitute(x))) {
-  save(x, file = sprintf("%s.Rdata", filename))
-  system2("bucket='$WORKSPACE_BUCKET'")
-  system2(sprintf("gsutil cp /home/rstudio/%s.Rdata '$bucket'", filename))
-}
-
 #' Read CSV file from workspace
 #'
 #' @param file_path Path to CSV file
@@ -237,12 +225,24 @@ col_types <- function(x) {
   )
 }
 
+#' Move object from workspace to bucket
+#'
+#' @param x Object in global environment
+#' @param filename Name for exported Rdata file
+#' @returns Rdata file silently exported
+#' @export
+transfer_to_bucket <- function(x, filename = deparse(substitute(x))) {
+  save(x, file = sprintf("%s.Rdata", filename))
+  system2("bucket='$WORKSPACE_BUCKET'")
+  system2(sprintf("gsutil cp /home/rstudio/%s.Rdata '$bucket'", filename))
+}
+
 #' Move file from workspace to bucket for permanent storage
 #'
 #' @param file File in workspace
 #' @returns File silently exported
 #' @export
-aou_workspace_to_bucket <- function(file, directory = FALSE, bucket = getOption("aou.default.bucket")) {
+aou_workspace_to_bucket <- function(file, directory = FALSE, bucket = Sys.getenv("WORKSPACE_BUCKET")) {
   file <- gsub(" ", "_", file)
   tmp <- tempdir()
   tmp_log <- file.path(tmp, "cp.log")
@@ -266,8 +266,8 @@ aou_workspace_to_bucket <- function(file, directory = FALSE, bucket = getOption(
 #' @param file File in bucket
 #' @returns File silently exported
 #' @export
-aou_bucket_to_workspace <- function(file, directory = FALSE, bucket = getOption("aou.default.bucket")) {
-  bucket_files <- allofus::aou_ls_bucket(silent = TRUE)
+aou_bucket_to_workspace <- function(file, directory = FALSE, bucket = Sys.getenv("WORKSPACE_BUCKET")) {
+  bucket_files <- allofus::aou_ls_bucket(silent = TRUE, bucket = bucket)
   missing_files <- list()
   if (directory) {
     file <- paste0(file, "/:")

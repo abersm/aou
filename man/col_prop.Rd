@@ -42,25 +42,3 @@ Convert counts in contingency table to column percentages
 
 Convert counts in contingency table to row percentages
 }
-\examples{
-\dontrun{
-# table(covid$death, covid$gender) |> col_prop() |> colSums() # Output: c(1, 1)
-# covid |> col_prop(death, gender) |> colSums() # Output same as above
-}
-
-\dontrun{
-# table(covid$death, covid$gender) |> row_prop() |> rowSums() # Output: c(1, 1)
-# covid |> row_prop(death, gender) |> rowSums() # Output same as above
-}
-
-\dontrun{
-# table(covid$death, covid$gender) |> col_perc() |> colSums() # Output: c(100, 100)
-# covid |> col_perc(death, gender) |> colSums() # Output same as above
-}
-
-\dontrun{
-# table(covid$death, covid$gender) |> row_perc() |> rowSums() # Output: c(100, 100)
-# covid |> row_perc(death, gender) |> rowSums() # Output same as above
-}
-
-}

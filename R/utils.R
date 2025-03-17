@@ -99,13 +99,6 @@ update_list <- function(old, new) {
   old
 }
 
-#' Transpose a list
-#'
-#' @param x List
-#' @returns List
-#' @noRd
-transpose <- function(x) do.call(Map, c(c, x, USE.NAMES = TRUE))
-
 #' Not in operator
 #'
 #' @param lhs,rhs left and right hand side of operator, respectively
@@ -126,10 +119,10 @@ transpose <- function(x) do.call(Map, c(c, x, USE.NAMES = TRUE))
 #' Display specified number of rows of data frame as tibble
 #'
 #' @param df Data frame
-#' @param n Number of rows to display. Default is `15`
+#' @param n Number of rows to display. Default is `100`
 #' @returns Print first `n` rows of `df`
 #' @export
-top <- function(df, n = 15) print.data.frame(df, n = n)
+top <- function(df, n = 100) print(df, n = n)
 
 #' Template to create silent version of `lapply`
 #'
@@ -245,19 +238,6 @@ tryElse <- function(x, otherwise = NULL, silent = TRUE) {
   } else {
     tryCatch(x, error = function(e) otherwise)
   }
-}
-
-#' Install and load package from cran
-#'
-#' @param package Name of package. Enter as length 1  character vector
-#' @param ... Arguments passed to `require`
-#' @returns Packages silently loaded
-#' @export
-install_if_missing_then_load <- function(package, ...) {
-  if (!require(package, ...)) {
-    install.packages(package, verbose = FALSE)
-  }
-  library(package, character.only = TRUE, quietly = TRUE, ...)
 }
 
 #' Load packages from cran

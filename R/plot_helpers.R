@@ -1,32 +1,13 @@
 # Scale functions ---------------------------------------------------------
 
-#' Censor function
-#'
-#' Functionality from scales package
-#' @param x Vector
-#' @param ... Not used
-#' @returns Vector with same class and length as input
-#' @export
-rescale_none <- function(x, ...) x
-
 #' New fill scale
 #'
 #' Functionality from ggnewscale package
 #' @returns Called directly by user. Requires `ggplot_add.new_color`
-#' @export
+#' @noRd
 scale_fill_new <- function() {
   #structure(ggplot2::standardise_aes_names("fill"), class = "new_color")
   structure("fill", class = "new_color")
-}
-
-#' New color scale
-#'
-#' Functionality from ggnewscale package
-#' @rdname scale_fill_new
-#' @export
-scale_color_new <- function() {
-  #structure(ggplot2::standardise_aes_names("colour"), class = "new_color")
-  structure("colour", class = "new_color")
 }
 
 #' Add new color scale
@@ -206,66 +187,11 @@ ggplot_add.new_color <- function(object, plot, object_name) {
   }
 }
 
-#' Add categorical aes variables to data frame for plotting
-#'
-#' @param df Data frame
-#' @param vars_input List of inputs for each aesthetic variable. Order must match `vars_new`
-#' @param vars_new Character vector of variables to add to `df`.Order must match `vars_input`
-#' @param df_names Names of columns in `df`. Enter as character vector
-#' @param as_factor If `TRUE`, new column converted to factor. Length should be 1 or the same as `vars_input` and `vars_new`
-#' @param sep Separator between values. Default is `"/"`. Only relevant when element in `vars_input` has length > 1
-#' @returns Data frame with new columns for variables entered in `vars_new`. If variable in `vars_new` is already included in `df_names`, no new column will be added for that variable. Thus, can't overwrite `vars_new` in `df`. For elements of `vars_input` that are either `NULL` or refer to columns not present in `df`, new variable generated will be a constant. Used by `.create_plot_df_facs`
-#' @noRd
-.add_cat_aes_vars <- function(df, vars_input, vars_new, df_names = names(df), as_factor = TRUE, sep = "/") {
-  n <- length(vars_new)
-  as_factor <- rep(as_factor, length.out = n)
-  in_df <- vars_new %in% df_names
-  for (i in seq_len(n)) {
-    new <- vars_new[i]
-    factorize <- as_factor[i]
-    if (in_df[i]) {
-      vals <- .subset2(df, new)
-      if (factorize && !is.factor(vals)) {
-        df[[new]] <- factor(vals, levels = create_levels(vals))
-      }
-    } else if (is.null(current <- .subset2(vars_input, i))) {
-      df[[new]] <- if (factorize) factor("a", levels = "a") else "a"
-    } else if (any(idx <- current %!in% df_names)) {
-      warning_message <- if (sum(idx) > 1L) {
-        sprintf("Variables %s entered in plotting function for aesthetic '%s' but variables %s aren't columns in 'df'", .quote_collapse(current), new, .quote_collapse(current[idx]))
-      } else {
-        sprintf("Variable '%s' entered in plotting function for aesthetic '%s' but is not a column in 'df'.", current, new)
-      }
-      remaining_vars <- current[!idx]
-      if (length(remaining_vars) == 0L) {
-        Warning(warning_message, "\nWill set this aesthetic to a constant")
-        df[[new]] <- if (factorize) factor("a", levels = "a") else "a"
-      } else {
-        Warning(warning_message, sprintf("\nWill use other entries (%s) for this aesthetic", .quote_collapse(remaining_vars)))
-        df <- combine_vars(df, remaining_vars, sep_cols = sep, new_colname = new, as_factor = factorize)
-      }
-    } else if (length(current) == 1L) {
-      vals <- .subset2(df, current)
-      df[[new]] <- if (factorize && !is.factor(vals)) factor(vals, levels = create_levels(vals)) else vals
-    } else {
-      df <- combine_vars(df, current, sep_cols = sep, new_colname = new, as_factor = factorize)
-    }
-  }
-  df
-}
-
-# Other -------------------------------------------------------------------
-
-
-#' Golden ratio (phi)
-#'
-.golden_ratio <- 0.5 + sqrt(5)/2
-
 #' Convert plot to ggplot object
 #'
 #' @param x Code to generate base plot
 #' @returns ggplot object
-#' @export
+#' @noRd
 as_ggplot <- function(x) {
   if (is.null(x)) {
     x <- substitute(x)
@@ -280,22 +206,12 @@ as_ggplot <- function(x) {
     draw_grob(as_grob(x), x = 0, y = 0, width = 1, height = 1, scale = 1, hjust = 0, vjust = 0, halign = 0.5, valign = 0.5)
 }
 
-#' Convert input to ggplot object
-#'
-#' @rdname as_ggplot
-#' @param ... Arguments passed to `ggplotify::as.ggplot`
-#' @export
-as_ggplot_ggplotify <- function(x, ...) {
-  pkg_required("ggplotify")
-  ggplotify::as.ggplot(x, ...)
-}
-
 #' Convert base plot to ggplot object
 #'
 #' @param expr Plotting expression
 #' @param envir Environment in which `expr` should be evaluated. Default is parent frame
 #' @returns ggplot
-#' @export
+#' @noRd
 base_to_ggplot <- function(expr, envir = parent.frame()) {
   expr <- substitute(expr)
   pkg_required("gridGraphics")
@@ -324,33 +240,6 @@ capture_base_plot <- function() {
   x <- grDevices::dev.cur()
   if (x == 1 || names(x)[1L] == "null device") return(invisible())
   invisible(grDevices::recordPlot())
-}
-
-#' Parse expressions safely
-#'
-#' @param x Character vector
-#' @returns Expression vector
-#' @noRd
-.parse_safe <- function(x) {
-  stopifnot(is.character(x))
-  out <- vector(mode = "expression", length = length(x))
-  for (i in seq_along(x)) {
-    expr <- parse(text = x[[i]])
-    out[[i]] <- if (length(expr) == 0L) NA else expr[[1L]]
-  }
-  out
-}
-
-#' Automatically determine whether log transformation is needed
-#'
-#' @param x Numeric vector
-#' @param breaks_fn Function used to generate breaks. Default is `pretty`
-#' @param n Number of desired breaks. Default is `4`
-#' @param min_log_breaks Minimum number of breaks tolerable on log scale. Default is `4`
-#' @returns Logical vector of length 1. If `TRUE`, it would be reasonable to choose a log scale over a linear scale
-#' @noRd
-.prefer_log <- function(x, breaks_fn = pretty, n = 4, min_log_breaks = 4) {
-  length(.create_axis_breaks(.limits = Range(x), .scale = "log", .n = n)) >= min_log_breaks
 }
 
 #' Check a vector for zero range

@@ -19,9 +19,3 @@ Matrix. If \code{col_to_rownames = NULL}, dimensions of output matrix will be id
 \description{
 Functionality from \code{base::data.matrix}
 }
-\examples{
-\dontrun{
-# df_to_matrix(mtcars)
-}
-
-}

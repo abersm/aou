@@ -163,25 +163,6 @@ Quantile <- function(x, probs = c(0, 0.25, 0.5, 0.75, 1), prism = FALSE) {
   }
 }
 
-#' 25th percentile
-#'
-#' @rdname Quantile
-#' @export
-Q1 <- function(x) Quantile(x, probs = 0.25)
-
-#' 75th percentile
-#'
-#' @rdname Quantile
-#' @export
-Q3 <- function(x) Quantile(x, probs = 0.75)
-
-#' IQR
-#'
-#' @rdname Quantile
-#' @returns Length 2 numeric vector containing 25th and 75th percentile values
-#' @export
-iqr <- function(x) Quantile(x, probs = c(0.25, 0.75))
-
 #' Confidence interval difference from mean
 #'
 #' CI = z*SE
