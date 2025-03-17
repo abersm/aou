@@ -195,7 +195,7 @@ plot_bar <- function(
           oob = censor_fn
         )
     } else {
-      p <- p + ggplot2::scale_continuous(axis = "y", scale = y_scale, labels = y_axis_labels, title = y_axis_title, censor_fn = censor_fn)
+      p <- p + scale_continuous(axis = "y", scale = y_scale, labels = y_axis_labels, title = y_axis_title, censor_fn = censor_fn)
     }
   } else if (show_all) {
     y_axis_breaks <- y_axis_breaks %||% .create_axis_breaks(.limits = c(0, y_max), .scale = y_scale, .breaks_fn = breaks_fn, .n = n_breaks)

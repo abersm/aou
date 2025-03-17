@@ -1,10 +1,10 @@
 # Functionality from aou.reader package
-
 .download_query <- function(sql, date_column, dest, anchor_date_table, before, after) {
   .window_data(.download_big_data(sql, dest), date_column, anchor_date_table, before, after)
 }
 
 .window_data <- function(dat, date_column, anchor_date_table, before, after) {
+  pkg_required("data.table")
   if (!is.null(anchor_date_table)) {
     dat <- data.table::as.data.table(merge(dat, anchor_date_table, by = "person_id", allow.cartesian = TRUE))
     dat[, min_window_date := anchor_date + before]
@@ -26,6 +26,7 @@
 #' @returns If `rm_csv = TRUE`, it will return a data.table corresponding to the query only.  If `rm_csv = FALSE`, then in addition to the above, a csv file will also be saved to a folder called aou_reader in the workspace bucket
 #' @noRd
 .download_big_data <- function(query, dest, rm_csv = TRUE) {
+  pkg_required("data.table")
   bucket <- Sys.getenv("WORKSPACE_BUCKET")
   output_folder <- stringr::str_glue("{bucket}/{dest}/")
   dest <- paste0(output_folder, gsub(".csv", "_*.csv", dest))
@@ -42,14 +43,14 @@
   .window_data(.download_big_data(sql, dest), date_column, anchor_date_table, before, after)
 }
 
-#' Concept code query
+#' Condition concept code query
 #'
 #' Example: concept_code_query(c(441641, 4014295))
-#' @param x Character vector or string containing medication names
-#' @param anchor_date_table Data frame with 2 columns: person_id, anchor_date. A time window can be defined around the anchor date using the `before` and `after` arguments
+#' @param x Character vector of concept codes
+#' @param anchor_date_table Data frame with 2 columns: person_id, anchor_date. Time window can be defined around anchor_date using `before` and `after`
 #' @param before integer >= 0. Dates prior to anchor_date + before will be excluded
 #' @param after integer >= 0. Dates after anchor_date + after will be excluded
-#' @returns data.table containing the following columns: person_id, condition_start_date, concept_name, condition_concept_id
+#' @returns Data frame with columns: person_id, condition_start_date, concept_name, condition_concept_id
 #' @export
 concept_code_query <- function(x, anchor_date_table = NULL, before = NULL, after = NULL, dest = "concept_code_query_result.csv") {
   date_column <- "condition_start_date"
@@ -69,7 +70,7 @@ concept_code_query <- function(x, anchor_date_table = NULL, before = NULL, after
 #' @param concept_ids Numeric vector with condition concept ids
 #' @param source_values Character vector with condition source values
 #' @rdname concept_code_query
-#' @returns data.table containing the following columns: person_id, condition_start_date, condition_concep_id, condition_source_value
+#' @returns Data table with columns: person_id, condition_start_date, condition_concep_id, condition_source_value
 #' @export
 condition_query <- function(concept_ids = NULL, source_values = NULL, anchor_date_table = NULL, before = NULL, after = NULL, dest = "condition_query_result.csv") {
   if (is.null(concept_ids) && is.null(source_values)) {
@@ -99,7 +100,7 @@ condition_query <- function(concept_ids = NULL, source_values = NULL, anchor_dat
 
 #' Demographics query
 #'
-#' @returns data.table with the following columns: person_id, date_of_birth, race, ethnicity, sex
+#' @returns Data frame with columns: person_id, date_of_birth, race, ethnicity, sex
 #' @rdname concept_code_query
 #' @export
 demographics_query <- function(dest = "demographics_query_result.csv",  anchor_date_table = NULL, before = NULL, after = NULL) {
@@ -127,8 +128,8 @@ demographics_query <- function(dest = "demographics_query_result.csv",  anchor_d
 #' Lab concept query
 #'
 #' Example: lab_concept_query(c(586520,586523,586525))
-#' @param x Character vector or string containing the labs concepts to query
-#' @returns data.table containing the following columns: person_id, measurement_date, value_as_number, value_as_concept
+#' @param x Character vector of lab concept codes
+#' @returns Data frame with columns: person_id, measurement_date, value_as_number, value_as_concept
 #' @rdname concept_code_query
 #' @export
 lab_concept_query <- function(x, anchor_date_table = NULL, before = NULL, after = NULL, dest = "lab_concept_query_result.csv") {
@@ -146,8 +147,8 @@ lab_concept_query <- function(x, anchor_date_table = NULL, before = NULL, after 
 #' Lab query
 #'
 #' Example: lab_query(c("Triglyceride [Mass/volume] in Serum or Plasma","Triglyceride [Mass/volume] in Blood"))
-#' @param x Character vector or string containing the labs to query
-#' @returns data.table containing the following columns: person_id, measurement_date, value_as_number
+#' @param x Character vector of lab names
+#' @returns Data frame with columns: person_id, measurement_date, value_as_number
 #' @rdname concept_code_query
 #' @export
 lab_query <- function(x, anchor_date_table = NULL, before = NULL, after = NULL, dest = "lab_query_result.csv") {
@@ -163,12 +164,12 @@ lab_query <- function(x, anchor_date_table = NULL, before = NULL, after = NULL, 
   .download_query(query, dest, date_column, anchor_date_table, before, after)
 }
 
-#' Lab query with extended columns
+#' Lab query with additional columns
 #'
 #' Example: lab_query(c("Triglyceride [Mass/volume] in Serum or Plasma","Triglyceride [Mass/volume] in Blood"), ext_cols = c("unit_source_value"))
-#' @param x Character vector or string containing the labs to query
-#' @param ext_cols Extra columns to return on top of the date and value of the lab
-#' @returns data.table containing the following columns: person_id, measurement_date, value_as_number, ext_cols
+#' @param x Character vector of lab names
+#' @param ext_cols Extra columns (aside from date and lab value) to include in output
+#' @returns Data frame with columns: person_id, measurement_date, value_as_number, ext_cols
 #' @export
 lab_query_extended <- function(x, ext_cols = NULL, anchor_date_table = NULL, before = NULL, after = NULL, dest = "lab_query_result.csv") {
   date_column <- "measurement_date"
@@ -196,8 +197,8 @@ lab_query_extended <- function(x, ext_cols = NULL, anchor_date_table = NULL, bef
 
 #' Medication query
 #'
-#' @param x Character vector or string containing medication names
-#' @returns data.table containing the following columns: person_id, drug_exposure_start_date
+#' @param x Character vector of medication names
+#' @returns Data frame with columns: person_id, drug_exposure_start_date
 #' @rdname concept_code_query
 #' @export
 rx_query <- function(x, anchor_date_table = NULL, before = NULL, after = NULL, dest = "med_query_result.csv") {
@@ -216,10 +217,10 @@ rx_query <- function(x, anchor_date_table = NULL, before = NULL, after = NULL, d
   .download_query(query, dest, date_column, anchor_date_table, before, after)
 }
 
-#' Medication with record source information query
+#' Medication query with source information
 #'
-#' @param x Character vector or string containing medication names
-#' @returns data.table containing the following columns: person_id, drug_exposure_start_date, record_source
+#' @param x Character vector of medication names
+#' @returns Data frame with columns: person_id, drug_exposure_start_date, record_source
 #' @rdname concept_code_query
 #' @export
 rx_with_record_source_query <- function(x, anchor_date_table = NULL, before = NULL, after = NULL, dest = "med_with_drug_type_query_result.csv") {
@@ -243,7 +244,7 @@ rx_with_record_source_query <- function(x, anchor_date_table = NULL, before = NU
 
 #' BMI query
 #'
-#' @returns data.table with the following columns: person_id, measurement_date, bmi
+#' @returns Data frame with the following columns: person_id, measurement_date, bmi
 #' @rdname concept_code_query
 #' @export
 bmi_query <- function(anchor_date_table = NULL, before = NULL, after = NULL, dest = "bmi_query_result.csv") {
@@ -297,7 +298,7 @@ bmi_query <- function(anchor_date_table = NULL, before = NULL, after = NULL, des
 
 #' Death
 #'
-#' @returns data.table with the following columns: person_id, death_entry_date
+#' @returns Data frame with the following columns: person_id, death_entry_date
 #' @rdname concept_code_query
 #' @export
 death_query <- function(anchor_date_table = NULL, before = NULL, after = NULL, dest = "death_query_result.csv") {
@@ -314,8 +315,8 @@ death_query <- function(anchor_date_table = NULL, before = NULL, after = NULL, d
 #' Survey query
 #'
 #' Example: survey_query("1585860")
-#' @param x Character vector or string of survey codes
-#' @returns data.table with the following columns: person_id, survey_response, survey_date
+#' @param x Character vector of survey codes
+#' @returns Data frame with the following columns: person_id, survey_response, survey_date
 #' @rdname concept_code_query
 #' @export
 survey_query <- function(x, anchor_date_table = NULL, before = NULL, after = NULL, dest = "survey_query.csv") {
@@ -339,7 +340,7 @@ survey_query <- function(x, anchor_date_table = NULL, before = NULL, after = NUL
 
 #' WGS
 #'
-#' @returns data.table with the following columns: person_id
+#' @returns Data frame with the following columns: person_id
 #' @rdname concept_code_query
 #' @export
 wgs_query <- function(dest = "wgs_query_result.csv") {
@@ -366,11 +367,11 @@ wgs_query <- function(dest = "wgs_query_result.csv") {
   .download_query(query, dest, "", NULL, before, after)
 }
 
-#' ICD-10
+#' ICD-10 query
 #'
 #' Example: icd10_query(c("I21","I21.%"))
-#' @param x Character vector of ICD10 codes. String can contain wildcards using % (e.g. "410.%")
-#' @returns data.table with the following columns: person_id, condition_start_date, condition_source_value
+#' @param x Character vector of ICD10 codes. May contain wildcards using % (e.g. "410.%")
+#' @returns Data frame with columns: person_id, condition_start_date, condition_source_value
 #' @rdname concept_code_query
 #' @export
 icd10_query <- function(x = NULL, anchor_date_table = NULL, before = NULL, after = NULL, dest = "icd10_query_result.csv") {
@@ -406,10 +407,10 @@ icd10_query <- function(x = NULL, anchor_date_table = NULL, before = NULL, after
   .download_query(query, dest, date_column, anchor_date_table, before, after)
 }
 
-#' SNOMED
+#' SNOMED condition query
 #'
-#' @param x Character vector or character string containing snomed codes. String can contain wildcards using % (e.g. "410.%")
-#' @returns data.table with the following columns: person_id, condition_start_date, condition_source_value
+#' @param x Character vector of SNOMED condition codes. May contain wildcards using % (e.g. "410.%")
+#' @returns Data frame with columns: person_id, condition_start_date, condition_source_value
 #' @rdname concept_code_query
 #' @export
 snomed_query <- function(x = NULL, anchor_date_table = NULL, before = NULL, after = NULL, dest = "snomed_query_result.csv") {

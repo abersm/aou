@@ -8,7 +8,7 @@
 install_if_missing_then_load(package, ...)
 
 Lib(
-  x,
+  ...,
   lib.loc = NULL,
   warn.conflicts,
   mask.ok,
