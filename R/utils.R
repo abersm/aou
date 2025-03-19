@@ -265,4 +265,4 @@ Lib <- function(
   }
 }
 
-rescale_none <- function(x) x
+rescale_none <- function(x, ...) x

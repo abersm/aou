@@ -212,7 +212,7 @@ ggplot_add.axis_clean <- function(object, plot, object_name) {
       breaks = breaks,
       labels = labels,
       trans = trans,
-      oob = object$censor_fn,
+      oob = identity,
       position = position,
       expand = c(expand_lower, 0, object$expand_upper, 0),
       guide = ggplot2::guide_axis(cap = object$cap)
