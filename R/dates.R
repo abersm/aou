@@ -15,16 +15,12 @@ today <- function() {
 #' @param date_fn Function used to convert `t0` and `t1` to dates. Default is `as.Date.` Other options: `lubridate::ymd`
 #' @returns Numeric vector with units of time determined by `units`
 #' @export
-time_interval <- function(
-    t0,
-    t1,
-    units = "days",
-    date_fn = function(x) as.Date(x, tryFormats = c("%Y-%m-%d", "%Y/%m/%d"))) {
-  if (units == "years") {
-    as.numeric(difftime(date_fn(t1), date_fn(t0), units = "days"))/365
-  } else {
-    as.numeric(difftime(date_fn(t1), date_fn(t0), units = units))
-  }
+time_interval <- function(t0, t1, units = c("days", "secs", "mins", "hours", "weeks", "months", "years"), date_fn = function(x) if (is_date(x)) x else as.Date(x, tryFormats = c("%Y-%m-%d", "%Y/%m/%d"))) {
+  f <- function(x) unclass(as.POSIXct(date_fn(x)))
+  delta <- f(t1) - f(t0)
+  attr(delta, "tzone") <- NULL
+  units <- match.arg(units, choices = c("days", "secs", "mins", "hours", "weeks", "months", "years"))
+  switch(units, secs = delta, mins = delta/60, hours = delta/3600, days = delta/86400, weeks = delta/(7*86400), years = delta/(365.25*86400), months = delta/(365.25*86400/12))
 }
 
 #' Test whether vector contains date object
