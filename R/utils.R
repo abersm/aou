@@ -266,3 +266,44 @@ Lib <- function(
 }
 
 rescale_none <- function(x, ...) x
+
+.dots_as_vector <- function(...) {
+  tryCatch(c(...), error = function(e) {
+    env <- parent.frame()
+    n <- ...length()
+    dots_quoted <- unlist(lapply(eval(substitute(alist(...))), function(x) {
+      gsub("\"", "", deparse(x, width.cutoff = 500L))
+    }), use.names = FALSE)
+    dots_unquoted <- unlist(rlang::eval_bare(substitute(alist(...))), use.names = FALSE)
+    out <- lapply(seq_len(n), function(i) {
+      z <- dots_unquoted[[i]]
+      if (is.symbol(z)) {
+        z <- tryCatch(eval(z, envir = env), error = function(e) NULL)
+      }
+      if (!is.vector(z)) {
+        z <- dots_quoted[[i]]
+      }
+      z
+    })
+    unlist(out, use.names = FALSE)
+  })
+}
+
+#' Print vector of quoted values can be copied as R code
+#'
+#' @param ... Comma separated list of quoted or unquoted values
+#' @returns Output printed to console
+#' @export
+paste_quoted <- function(...) {
+  dots <- .dots_as_vector(...)
+  cat(sprintf("c(%s)", paste(shQuote(noquote(dots), type = "cmd"), collapse = ", ")))
+}
+
+#' Print vector of unquoted values can be copied as R code
+#'
+#' @rdname paste_quoted
+#' @export
+paste_unquoted <- function(...) {
+  dots <- .dots_as_vector(...)
+  cat(paste(dots, collapse = ", "))
+}
